@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 
+import com.andela.checkpoint.onestep.models.LocationHelper;
 import com.andressantibanez.ranger.Ranger;
 import com.dlazaro66.wheelindicatorview.WheelIndicatorItem;
 import com.dlazaro66.wheelindicatorview.WheelIndicatorView;
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         setUpBasicUI();
+        LocationHelper locationHelper = new LocationHelper(this);
 
     }
 
