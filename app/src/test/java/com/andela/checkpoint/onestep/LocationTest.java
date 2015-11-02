@@ -66,11 +66,14 @@ public class LocationTest {
 
     @Test
     public void testLocationSavesAndDeletes() throws Exception {
+        List<Location> locations = testLocationHelper.getLocations();
+        assertNull("Should be null", locations);
+
         testLocationHelper.addLocation(testLocationOne);
         testLocationHelper.addLocation(testLocationTwo);
         testLocationHelper.addLocation(testLocationThree);
 
-        List<Location> locations = testLocationHelper.getLocations();
+        locations = testLocationHelper.getLocations();
         assertEquals("Should be three", locations.size(), 3, 0.0);
 
         Location temp = testLocationHelper.getLocation(testLocationOne.getID());

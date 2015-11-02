@@ -20,7 +20,6 @@ import static com.andela.checkpoint.onestep.database.LocationDbSchema.*;
  */
 public class LocationHelper {
     private static LocationHelper sLocationHelper;
-    private List<Location> mLocations;
     private Context mContext;
     private SQLiteDatabase mDatabase;
 
