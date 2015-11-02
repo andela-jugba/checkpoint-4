@@ -49,11 +49,13 @@
             android:textSize="16sp" />
 
     </FrameLayout>
+
     <FrameLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_weight="20"
         android:background="@color/colorAccent">
+
         <Button
             android:id="@+id/buttonCounterBackground"
             android:layout_width="206dp"
@@ -76,10 +78,25 @@
             android:layout_gravity="center"
             android:background="@drawable/circle_center" />
 
-        <NumberPicker
-            android:id="@+id/numberPicker"
+        <LinearLayout
+            android:id="@+id/hiddenView"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <com.andressantibanez.ranger.Ranger
+                android:id="@+id/listener_ranger"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbarSize="4dp"
+                app:dayTextColor="#eeeeee"
+                app:daysContainerBackgroundColor="#73B05C"
+                app:displayDayOfWeek="false"
+                app:selectedDayBackgroundColor="#FFAA4D"
+                app:selectedDayTextColor="#444444" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/textView"
@@ -91,6 +108,7 @@
             android:textColor="@color/white"
             android:textSize="71sp"
             android:textStyle="bold" />
+
         <TextView
             android:id="@+id/textViewSec"
             android:layout_width="wrap_content"
@@ -102,6 +120,7 @@
             android:textSize="36sp"
             android:textStyle="normal" />
     </FrameLayout>
+
     <FrameLayout
         android:id="@+id/frame_play"
         android:layout_width="match_parent"
@@ -111,7 +130,20 @@
         android:layout_alignParentStart="true"
         android:layout_weight="0.5"
         android:background="#53B4DF">
+
+        <TextView
+            android:id="@+id/textViewPlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="start"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="45sp"
+            android:textStyle="bold" />
+
         <Button
+            android:id="@+id/buttonPlay"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="center"
@@ -119,5 +151,6 @@
             android:layout_marginTop="@dimen/fab_margin_top"
             android:background="@drawable/triangular_button"
             android:rotation="90" />
+
     </FrameLayout>
 </LinearLayout>

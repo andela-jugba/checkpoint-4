@@ -1,1 +1,1 @@
-include ':app', ':WheelIndicatorView'
+include ':app', ':WheelIndicatorView', ':Ranger'

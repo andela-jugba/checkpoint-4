@@ -5,4 +5,5 @@
     <color name="colorAccent">#28A1D8</color>
     <color name="transparent">#000000</color>
     <color name="white">#ffffff</color>
+    <color name="whitefiftypercent">#80ffffff</color>
 </resources>

@@ -10,17 +10,29 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.andressantibanez.ranger.Ranger;
 import com.dlazaro66.wheelindicatorview.WheelIndicatorItem;
 import com.dlazaro66.wheelindicatorview.WheelIndicatorView;
 
-public class MainActivity extends AppCompatActivity {
+import static android.view.View.TEXT_DIRECTION_FIRST_STRONG;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     WheelIndicatorView wheelIndicatorView;
     CountDownTimer countDownTimer;
+    private Button mButtonSetStep;
+    private Button buttonPlay;
+    private TextView textViewStart;
 
+    private View hiddenView;
     private TextView mCounter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         // dummy data
         float dailyKmsTarget = 10.0f; // 4.0Km is the user target, for example
         float totalKmsDone = 10.0f; // User has done 3 Km
-        int percentageOfExerciseDone = (int) (totalKmsDone/dailyKmsTarget * 100); //
+        int percentageOfExerciseDone = (int) (totalKmsDone / dailyKmsTarget * 100); //
         wheelIndicatorView.setFilledPercent(percentageOfExerciseDone);
 
         WheelIndicatorItem bikeActivityIndicatorItem = new WheelIndicatorItem(0.1f, Color.parseColor("#62B9D5"));
@@ -53,43 +65,87 @@ public class MainActivity extends AppCompatActivity {
 
         wheelIndicatorView.addWheelIndicatorItem(bikeActivityIndicatorItem);
 
-        NumberPicker num = (NumberPicker) findViewById(R.id.numberPicker);
-        num.setMaxValue(10);
-        num.setMinValue(1);
-        num.setWrapSelectorWheel(true);
-        num.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-            @Override
-            public void onValueChange(NumberPicker numberPicker, int i, int i1) {
-                countDownTimer.cancel();
 
-                countDownTimer = new CustomCountDown(i1 * 60 *1000,1000);
-                countDownTimer.start();
-//                wheelIndicatorView.setFilledPercent(i1);
-//                wheelIndicatorView.notifyDataSetChanged();
+        mCounter = (TextView) findViewById(R.id.textView);
+        countDownTimer = new CustomCountDown(60000, 1000);
+
+
+        mButtonSetStep = (Button) findViewById(R.id.buttonSetStep);
+        hiddenView = findViewById(R.id.hiddenView);
+
+        mButtonSetStep.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hiddenView.setVisibility(View.VISIBLE);
+
             }
         });
 
-        mCounter = (TextView) findViewById(R.id.textView);
-        countDownTimer = new CustomCountDown(60000,1000);
-        mCounter.setText(String.valueOf(10));
-        countDownTimer.start();
+
+        buttonPlay = (Button) findViewById(R.id.buttonPlay);
+        buttonPlay.setVisibility(View.INVISIBLE);
+        textViewStart = (TextView) findViewById(R.id.textViewPlay);
+        textViewStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mButtonSetStep.isEnabled()) {
+                    mButtonSetStep.setEnabled(false);
+                    countDownTimer.start();
+                    textViewStart.setText("stop");
+                    return;
+                }
+                countDownTimer.cancel();
+                textViewStart.setText("start");
+                mButtonSetStep.setEnabled(true);
+            }
+        });
+        Ranger ranger = (Ranger) findViewById(R.id.listener_ranger);
+        ranger.setDayViewOnClickListener(new Ranger.DayViewOnClickListener() {
+            @Override
+            public void onDaySelected(int day) {
+                countDownTimer.cancel();
+
+                countDownTimer = new CustomCountDown(day * 60 * 1000, 1000);
+                hiddenView.setVisibility(View.INVISIBLE);
+
+                View parentLayout = findViewById(android.R.id.content);
+                if (day == 1) {
+                    Snackbar.make(parentLayout, "Step set for: " + day + " min", Snackbar.LENGTH_SHORT).show();
+                } else
+                    Snackbar.make(parentLayout, "Step set for: " + day + " mins", Snackbar.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
-    public class CustomCountDown extends CountDownTimer{
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+
+        if (id != R.id.hiddenView) {
+            Toast.makeText(MainActivity.this, "this works", Toast.LENGTH_SHORT).show();
+            hiddenView.setVisibility(View.INVISIBLE);
+        }
+
+    }
+
+    public class CustomCountDown extends CountDownTimer {
         private double mStartTime;
 
-        public CustomCountDown(long startTime, long interval){
-            super(startTime,interval);
-            mStartTime = startTime/1000;
+        public CustomCountDown(long startTime, long interval) {
+            super(startTime, interval);
+            mStartTime = startTime / 1000;
         }
 
 
         @Override
         public void onTick(long l) {
-            double a = l/1000;
-
-            mCounter.setText("" + l / 1000);
-            int percent = (int) ((mStartTime - a)/mStartTime * 100);
+            int a = (int) l / 1000;
+            if (a > 999) {
+                mCounter.setTextSize(60);
+            }
+            mCounter.setText("" + a);
+            int percent = (int) ((mStartTime - a) / mStartTime * 100);
             wheelIndicatorView.setFilledPercent(percent + 1);
             wheelIndicatorView.notifyDataSetChanged();
         }
@@ -125,4 +181,5 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
