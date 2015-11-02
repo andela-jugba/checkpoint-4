@@ -4,4 +4,7 @@
     <string name="set_step">SET STEP</string>
     <string name="logs">LOGS</string>
     <string name="intial_view_value">0</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
