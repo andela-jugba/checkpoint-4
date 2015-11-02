@@ -11,24 +11,21 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.HorizontalScrollView;
-import android.widget.LinearLayout;
-import android.widget.NumberPicker;
 import android.widget.TextView;
-import android.widget.Toast;
+
 
 import com.andressantibanez.ranger.Ranger;
 import com.dlazaro66.wheelindicatorview.WheelIndicatorItem;
 import com.dlazaro66.wheelindicatorview.WheelIndicatorView;
 
-import static android.view.View.TEXT_DIRECTION_FIRST_STRONG;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    WheelIndicatorView wheelIndicatorView;
-    CountDownTimer countDownTimer;
+public class MainActivity extends AppCompatActivity {
+    private WheelIndicatorView wheelIndicatorView;
+    private CountDownTimer countDownTimer;
     private Button mButtonSetStep;
     private Button buttonPlay;
     private TextView textViewStart;
+    private Ranger ranger;
 
     private View hiddenView;
     private TextView mCounter;
@@ -40,35 +37,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.hide();
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
+        setUpBasicUI();
 
-        wheelIndicatorView = (WheelIndicatorView) findViewById(R.id.wheel_indicator_view);
+    }
 
-        //WheelIndicatorView wheelIndicatorView = new WheelIndicatorView(this);
-        // dummy data
-        float dailyKmsTarget = 10.0f; // 4.0Km is the user target, for example
-        float totalKmsDone = 10.0f; // User has done 3 Km
-        int percentageOfExerciseDone = (int) (totalKmsDone / dailyKmsTarget * 100); //
-        wheelIndicatorView.setFilledPercent(percentageOfExerciseDone);
-
-        WheelIndicatorItem bikeActivityIndicatorItem = new WheelIndicatorItem(0.1f, Color.parseColor("#62B9D5"));
-
-
-        wheelIndicatorView.addWheelIndicatorItem(bikeActivityIndicatorItem);
-
-
-        mCounter = (TextView) findViewById(R.id.textView);
-        countDownTimer = new CustomCountDown(60000, 1000);
-
+    private void setUpBasicUI() {
+        setUpWheelIndicator();
+        setUpCounter();
 
         mButtonSetStep = (Button) findViewById(R.id.buttonSetStep);
         hiddenView = findViewById(R.id.hiddenView);
@@ -99,7 +75,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mButtonSetStep.setEnabled(true);
             }
         });
-        Ranger ranger = (Ranger) findViewById(R.id.listener_ranger);
+
+        ranger = (Ranger) findViewById(R.id.listener_ranger);
+        ranger.setSelectedDay(5,false,10l);
         ranger.setDayViewOnClickListener(new Ranger.DayViewOnClickListener() {
             @Override
             public void onDaySelected(int day) {
@@ -115,18 +93,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Snackbar.make(parentLayout, "Step set for: " + day + " mins", Snackbar.LENGTH_SHORT).show();
             }
         });
-
     }
 
-    @Override
-    public void onClick(View view) {
-        int id = view.getId();
+    private void setUpCounter() {
+        mCounter = (TextView) findViewById(R.id.textView);
+        countDownTimer = new CustomCountDown(300000, 1000);
+    }
 
-        if (id != R.id.hiddenView) {
-            Toast.makeText(MainActivity.this, "this works", Toast.LENGTH_SHORT).show();
-            hiddenView.setVisibility(View.INVISIBLE);
-        }
-
+    private void setUpWheelIndicator() {
+        wheelIndicatorView = (WheelIndicatorView) findViewById(R.id.wheel_indicator_view);
+        wheelIndicatorView.setFilledPercent(0);
+        WheelIndicatorItem timeProgressIndicator = new WheelIndicatorItem(0.1f, Color.parseColor("#62B9D5"));
+        wheelIndicatorView.addWheelIndicatorItem(timeProgressIndicator);
     }
 
     public class CustomCountDown extends CountDownTimer {
@@ -154,8 +132,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void onFinish() {
             mCounter.setText("0");
             this.start();
-//            wheelIndicatorView.setFilledPercent(100);
-//            wheelIndicatorView.notifyDataSetChanged();
         }
     }
 
@@ -176,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            return false;
         }
 
         return super.onOptionsItemSelected(item);
