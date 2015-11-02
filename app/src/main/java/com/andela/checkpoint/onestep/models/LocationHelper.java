@@ -31,7 +31,7 @@ public class LocationHelper {
         return sLocationHelper;
     }
     public LocationHelper(Context context) {
-        mContext = context;
+        mContext = context.getApplicationContext();
         mDatabase = new LocationBaseHelper(mContext).getWritableDatabase();
     }
 
@@ -98,6 +98,7 @@ public class LocationHelper {
 
         LocationCursorWrapper cursor = queryLocation(null, null);
         try {
+            if (cursor.getCount() == 0 ) return null;
             cursor.moveToFirst();
             while (!cursor.isAfterLast()){
                 locations.add(cursor.getLocation());
@@ -108,6 +109,14 @@ public class LocationHelper {
         }
         return locations;
 
+    }
+
+    public void deleteLocation(Location location){
+        String uuidString = location.getID().toString();
+
+        ContentValues values = getContentValues( location);
+        mDatabase.delete(LocationTable.NAME, LocationTable.Cols.UUID + " = ?",
+                new String[]{uuidString});
     }
 
 }
