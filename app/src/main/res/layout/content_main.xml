@@ -1,14 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:showIn="@layout/activity_main" tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    tools:showIn="@layout/activity_main">
 
-    <TextView android:text="Hello World!" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-</RelativeLayout>
+    <FrameLayout
+        android:id="@+id/frame_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.5"
+        android:background="#53B4DF"
+        android:elevation="@dimen/fab_margin">
+
+        <Button
+            android:id="@+id/buttonLog"
+            android:layout_width="57dp"
+            android:layout_height="57dp"
+            android:layout_gravity="center|right"
+            android:layout_marginBottom="@dimen/fab_margin_top"
+            android:layout_marginRight="@dimen/fab_margin"
+            android:layout_marginTop="@dimen/fab_margin_top"
+            android:background="@drawable/button_circle"
+            android:text="@string/logs"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/buttonSetStep"
+            android:layout_width="57dp"
+            android:layout_height="57dp"
+            android:layout_gravity="center|left"
+            android:layout_marginBottom="@dimen/fab_margin_top"
+            android:layout_marginLeft="@dimen/fab_margin"
+            android:layout_marginTop="@dimen/fab_margin_top"
+            android:background="@drawable/button_circle"
+            android:text="@string/set_step"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="20"
+        android:background="@color/colorAccent">
+
+        <Button
+            android:id="@+id/buttonCounterBackground"
+            android:layout_width="206dp"
+            android:layout_height="206dp"
+            android:layout_gravity="center"
+            android:background="@drawable/circle_background"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+
+        <com.dlazaro66.wheelindicatorview.WheelIndicatorView
+            android:id="@+id/wheel_indicator_view"
+            android:layout_width="178dp"
+            android:layout_height="178dp"
+            android:layout_gravity="center" />
+
+        <Button
+            android:id="@+id/buttonCenterCircle"
+            android:layout_width="148dp"
+            android:layout_height="148dp"
+            android:layout_gravity="center"
+            android:background="@drawable/circle_center" />
+
+        <LinearLayout
+            android:id="@+id/hiddenView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <com.andressantibanez.ranger.Ranger
+                android:id="@+id/listener_ranger"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbarSize="4dp"
+                app:dayTextColor="#eeeeee"
+                app:daysContainerBackgroundColor="#73B05C"
+                app:displayDayOfWeek="false"
+                app:selectedDayBackgroundColor="#FFAA4D"
+                app:selectedDayTextColor="#444444" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="@dimen/fab_margin"
+            android:text="45"
+            android:textColor="@color/white"
+            android:textSize="71sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textViewSec"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="32dp"
+            android:text="secs"
+            android:textColor="@color/white"
+            android:textSize="36sp"
+            android:textStyle="normal" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/frame_play"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_weight="0.5"
+        android:background="#53B4DF">
+
+        <TextView
+            android:id="@+id/textViewPlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="start"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="45sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/buttonPlay"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="@dimen/fab_margin_top"
+            android:layout_marginTop="@dimen/fab_margin_top"
+            android:background="@drawable/triangular_button"
+            android:rotation="90" />
+
+    </FrameLayout>
+</LinearLayout>

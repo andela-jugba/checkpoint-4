@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/OneStep.iml" filepath="$PROJECT_DIR$/OneStep.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Ranger/Ranger.iml" filepath="$PROJECT_DIR$/Ranger/Ranger.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/libs/WheelIndicatorView/WheelIndicatorView/WheelIndicatorView.iml" filepath="$PROJECT_DIR$/app/libs/WheelIndicatorView/WheelIndicatorView/WheelIndicatorView.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
