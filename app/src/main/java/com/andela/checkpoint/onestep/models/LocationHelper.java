@@ -10,7 +10,11 @@ import com.andela.checkpoint.onestep.database.LocationCursorWrapper;
 import com.andela.checkpoint.onestep.database.LocationDbSchema;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.andela.checkpoint.onestep.database.LocationDbSchema.*;
@@ -29,24 +33,46 @@ public class LocationHelper {
         }
         return sLocationHelper;
     }
+
     public LocationHelper(Context context) {
         mContext = context.getApplicationContext();
         mDatabase = new LocationBaseHelper(mContext).getWritableDatabase();
+
+//        Location testLocationOne = new Location();
+//        testLocationOne.setName("M55");
+//        testLocationOne.setLatitude(6.777);
+//        testLocationOne.setLongitude(5.66);
+//        testLocationOne.setTimesVisited(1);
+//        this.addLocation(testLocationOne);
+//
+//        Location testLocationTwo = new Location();
+//        testLocationTwo.setName("Yaba");
+//        testLocationTwo.setLatitude(6.567);
+//        testLocationTwo.setLongitude(5.645);
+//        testLocationTwo.setTimesVisited(1);
+//        this.addLocation(testLocationTwo);
+//
+//        Location testLocationThree = new Location();
+//        testLocationThree.setName("Amity");
+//        testLocationThree.setLatitude(7.8);
+//        testLocationThree.setLongitude(7.88);
+//        testLocationThree.setTimesVisited(1);
+//        this.addLocation(testLocationThree);
     }
 
     public Location getLocation(UUID id) {
         LocationCursorWrapper cursor = queryLocation(
-                LocationTable.Cols.UUID+ " = ?",
+                LocationTable.Cols.UUID + " = ?",
                 new String[]{id.toString()}
         );
 
         try {
-            if(cursor.getCount() == 0){
+            if (cursor.getCount() == 0) {
                 return null;
             }
             cursor.moveToFirst();
             return cursor.getLocation();
-        }finally {
+        } finally {
             cursor.close();
         }
 
@@ -63,7 +89,7 @@ public class LocationHelper {
         return values;
     }
 
-    public void addLocation(Location location){
+    public void addLocation(Location location) {
         ContentValues values = getContentValues(location);
         mDatabase.insert(LocationTable.NAME, null, values);
     }
@@ -92,30 +118,69 @@ public class LocationHelper {
         return new LocationCursorWrapper(cursor);
     }
 
+    /**
+     * Queries for all locations in the Db
+     * @return a List of locations
+     */
     public List<Location> getLocations() {
         List<Location> locations = new ArrayList<>();
 
         LocationCursorWrapper cursor = queryLocation(null, null);
         try {
-            if (cursor.getCount() == 0 ) return null;
+            if (cursor.getCount() == 0) return null;
             cursor.moveToFirst();
-            while (!cursor.isAfterLast()){
+            while (!cursor.isAfterLast()) {
                 locations.add(cursor.getLocation());
                 cursor.moveToNext();
             }
-        }finally {
+        } finally {
             cursor.close();
         }
         return locations;
 
     }
 
-    public void deleteLocation(Location location){
+    /**
+     * Queries for unique date
+     * @return a set of dates
+     */
+    public HashMap<Date, List<Location>> getLocationByDate(){
+        DateCriterion dateCriteria = new DateCriterion();
+        Set<Date> dates = new HashSet<>();
+        List<Location> locations = new ArrayList<>();
+
+        HashMap<Date, List<Location>> locationByDate = new HashMap<>();
+
+        LocationCursorWrapper cursor = queryLocation(null, null);
+        try {
+            if (cursor.getCount() == 0) return null;
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                Location temp = cursor.getLocation();
+                dates.add(temp.getDate());
+                locations.add(temp);
+                cursor.moveToNext();
+            }
+        } finally {
+            cursor.close();
+        }
+
+        for (Date date: dates){
+            List<Location> tempLocations = dateCriteria.meetCriteria(locations,date);
+            locationByDate.put(date,tempLocations);
+        }
+
+        return locationByDate;
+    }
+
+    public void deleteLocation(Location location) {
         String uuidString = location.getID().toString();
 
-        ContentValues values = getContentValues( location);
+        ContentValues values = getContentValues(location);
         mDatabase.delete(LocationTable.NAME, LocationTable.Cols.UUID + " = ?",
                 new String[]{uuidString});
     }
+
+
 
 }

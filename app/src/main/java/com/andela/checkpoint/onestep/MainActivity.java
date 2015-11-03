@@ -1,5 +1,6 @@
 package com.andela.checkpoint.onestep;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -14,6 +15,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 
+import com.andela.checkpoint.onestep.controllers.LocationListActivity;
 import com.andela.checkpoint.onestep.models.LocationHelper;
 import com.andressantibanez.ranger.Ranger;
 import com.dlazaro66.wheelindicatorview.WheelIndicatorItem;
@@ -25,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private CountDownTimer countDownTimer;
     private Button mButtonSetStep;
     private Button buttonPlay;
+    private Button mbuttonLogs;
     private TextView textViewStart;
     private Ranger ranger;
 
@@ -40,13 +43,25 @@ public class MainActivity extends AppCompatActivity {
 
 
         setUpBasicUI();
-        LocationHelper locationHelper = new LocationHelper(this);
+        LocationHelper locationHelper = LocationHelper.get(this);
 
     }
 
     private void setUpBasicUI() {
         setUpWheelIndicator();
         setUpCounter();
+
+        mbuttonLogs = (Button) findViewById(R.id.buttonLog);
+        mbuttonLogs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, LocationListActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
+
 
         mButtonSetStep = (Button) findViewById(R.id.buttonSetStep);
         hiddenView = findViewById(R.id.hiddenView);
@@ -79,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         ranger = (Ranger) findViewById(R.id.listener_ranger);
-        ranger.setSelectedDay(5,false,10l);
+        ranger.setSelectedDay(5, false, 10l);
         ranger.setDayViewOnClickListener(new Ranger.DayViewOnClickListener() {
             @Override
             public void onDaySelected(int day) {
@@ -160,4 +175,14 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (mButtonSetStep.isEnabled()) {
+            super.onBackPressed();
+
+        }
+        View parentLayout = findViewById(android.R.id.content);
+        Snackbar.make(parentLayout, "Tracking...", Snackbar.LENGTH_SHORT).show();
+
+    }
 }
