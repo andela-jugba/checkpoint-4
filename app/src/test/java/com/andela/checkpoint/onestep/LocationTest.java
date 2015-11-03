@@ -11,7 +11,12 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -86,6 +91,15 @@ public class LocationTest {
 
         locations = testLocationHelper.getLocations();
         assertEquals("Should be 2", locations.size(), 2, 0.0);
+
+        HashMap<Date, List<Location>> dates = testLocationHelper.getLocationByDate();
+        assertEquals("Should be 1", dates.size(), 1,0.0);
+
+        testLocationTwo.setDate(new GregorianCalendar(2015, 2, 11).getTime());
+        testLocationHelper.updateLocation(testLocationTwo);
+
+        dates = testLocationHelper.getLocationByDate();
+        assertEquals("Should be 2", dates.size(), 2, 0.0);
 
     }
 
