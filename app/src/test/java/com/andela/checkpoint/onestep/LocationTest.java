@@ -93,7 +93,7 @@ public class LocationTest {
         locations = testLocationHelper.getLocations();
         assertEquals("Should be 2", locations.size(), 2, 0.0);
 
-        HashMap<Date, List<Location>> dates = testLocationHelper.getLocationByDate();
+        HashMap<String, List<Location>> dates = testLocationHelper.getLocationByDate();
         assertEquals("Should be 1", dates.size(), 1, 0.0);
 
         testLocationTwo.setDate(new GregorianCalendar(2015, 2, 11).getTime());
@@ -103,7 +103,7 @@ public class LocationTest {
         assertEquals("Should be 2", dates.size(), 2, 0.0);
 
 
-        for (Map.Entry<Date, List<Location>> entry : dates.entrySet()) {
+        for (Map.Entry<String, List<Location>> entry : dates.entrySet()) {
             assertEquals(entry.getValue().size(), 1.0, 0.0);
         }
     }
