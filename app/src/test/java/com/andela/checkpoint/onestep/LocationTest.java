@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -93,7 +94,7 @@ public class LocationTest {
         assertEquals("Should be 2", locations.size(), 2, 0.0);
 
         HashMap<Date, List<Location>> dates = testLocationHelper.getLocationByDate();
-        assertEquals("Should be 1", dates.size(), 1,0.0);
+        assertEquals("Should be 1", dates.size(), 1, 0.0);
 
         testLocationTwo.setDate(new GregorianCalendar(2015, 2, 11).getTime());
         testLocationHelper.updateLocation(testLocationTwo);
@@ -101,6 +102,10 @@ public class LocationTest {
         dates = testLocationHelper.getLocationByDate();
         assertEquals("Should be 2", dates.size(), 2, 0.0);
 
+
+        for (Map.Entry<Date, List<Location>> entry : dates.entrySet()) {
+            assertEquals(entry.getValue().size(), 1.0, 0.0);
+        }
     }
 
 }

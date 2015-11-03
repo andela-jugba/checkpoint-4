@@ -9,6 +9,8 @@ import com.andela.checkpoint.onestep.database.LocationBaseHelper;
 import com.andela.checkpoint.onestep.database.LocationCursorWrapper;
 import com.andela.checkpoint.onestep.database.LocationDbSchema;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -144,20 +146,21 @@ public class LocationHelper {
      * Queries for unique date
      * @return a set of dates
      */
-    public HashMap<Date, List<Location>> getLocationByDate(){
+    public HashMap<String, List<Location>> getLocationByDate(){
         DateCriterion dateCriteria = new DateCriterion();
-        Set<Date> dates = new HashSet<>();
+        Set<String> dates = new HashSet<>();
         List<Location> locations = new ArrayList<>();
 
-        HashMap<Date, List<Location>> locationByDate = new HashMap<>();
+        HashMap<String, List<Location>> locationByDate = new HashMap<>();
 
+        DateFormat dateFormat = new SimpleDateFormat("EEEE dd,MMM,yyyy");
         LocationCursorWrapper cursor = queryLocation(null, null);
         try {
             if (cursor.getCount() == 0) return null;
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
                 Location temp = cursor.getLocation();
-                dates.add(temp.getDate());
+                dates.add(dateFormat.format(temp.getDate()));
                 locations.add(temp);
                 cursor.moveToNext();
             }
@@ -165,7 +168,7 @@ public class LocationHelper {
             cursor.close();
         }
 
-        for (Date date: dates){
+        for (String date: dates){
             List<Location> tempLocations = dateCriteria.meetCriteria(locations,date);
             locationByDate.put(date,tempLocations);
         }
@@ -173,6 +176,10 @@ public class LocationHelper {
         return locationByDate;
     }
 
+    /**
+     * deletes a location from the DB
+     * @param location
+     */
     public void deleteLocation(Location location) {
         String uuidString = location.getID().toString();
 

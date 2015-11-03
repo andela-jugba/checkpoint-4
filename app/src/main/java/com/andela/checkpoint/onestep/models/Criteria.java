@@ -7,5 +7,5 @@ import java.util.List;
  * Created by andela-jugba on 11/3/15.
  */
 public interface Criteria {
-    List<Location> meetCriteria(List<Location> locations, Date date);
+    List<Location> meetCriteria(List<Location> locations, String date);
 }
