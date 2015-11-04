@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.andela.checkpoint.onestep.controllers.LocationListActivity;
 import com.andela.checkpoint.onestep.models.LocationHelper;
+import com.andela.checkpoint.onestep.services.TrackerService;
 import com.andressantibanez.ranger.Ranger;
 import com.dlazaro66.wheelindicatorview.WheelIndicatorItem;
 import com.dlazaro66.wheelindicatorview.WheelIndicatorView;
@@ -85,6 +86,9 @@ public class MainActivity extends AppCompatActivity {
                     mButtonSetStep.setEnabled(false);
                     countDownTimer.start();
                     textViewStart.setText("stop");
+
+                    Intent intent = TrackerService.newIntent(MainActivity.this);
+                    startService(intent);
                     return;
                 }
                 countDownTimer.cancel();
