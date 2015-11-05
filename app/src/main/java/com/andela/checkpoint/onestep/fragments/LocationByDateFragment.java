@@ -49,8 +49,6 @@ public class LocationByDateFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         updateUI();
-        Map<String,List<Location>> map = mLocationHelper.getLocationByDate();
-        Log.i(TAG, "Number of unique days:" +map.size());
         return view;
     }
 

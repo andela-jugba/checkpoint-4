@@ -31,6 +31,7 @@ public class DateRecyclerViewAdapter extends RecyclerView.Adapter<SingleDateView
             int temp = 0;
             for (Map.Entry<String, List<Location>> entry : mListOfDates.entrySet()) {
                 tempMap.put(temp, entry.getKey());
+                temp++;
             }
             idMap = tempMap;
         }

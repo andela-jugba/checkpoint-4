@@ -8,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,12 +18,14 @@ import android.widget.TextView;
 
 import com.andela.checkpoint.onestep.controllers.LocationListActivity;
 import com.andela.checkpoint.onestep.models.LocationHelper;
+import com.andela.checkpoint.onestep.services.TrackerService;
 import com.andressantibanez.ranger.Ranger;
 import com.dlazaro66.wheelindicatorview.WheelIndicatorItem;
 import com.dlazaro66.wheelindicatorview.WheelIndicatorView;
 
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = MainActivity.class.getSimpleName() ;
     private WheelIndicatorView wheelIndicatorView;
     private CountDownTimer countDownTimer;
     private Button mButtonSetStep;
@@ -81,15 +84,23 @@ public class MainActivity extends AppCompatActivity {
         textViewStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent intent = TrackerService.newIntent(MainActivity.this);
                 if (mButtonSetStep.isEnabled()) {
                     mButtonSetStep.setEnabled(false);
                     countDownTimer.start();
                     textViewStart.setText("stop");
+                    intent.putExtra("start", true);
+                    startService(intent);
                     return;
                 }
+
+                stopService(intent);
+                Log.i(TAG, "service should be stopped");
                 countDownTimer.cancel();
                 textViewStart.setText("start");
                 mButtonSetStep.setEnabled(true);
+
+
             }
         });
 
@@ -184,5 +195,12 @@ public class MainActivity extends AppCompatActivity {
         View parentLayout = findViewById(android.R.id.content);
         Snackbar.make(parentLayout, "Tracking...", Snackbar.LENGTH_SHORT).show();
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Intent intent = TrackerService.newIntent(MainActivity.this);
+        stopService(intent);
     }
 }
