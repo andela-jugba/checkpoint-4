@@ -24,6 +24,15 @@ public class Location {
         mDate = new Date();
     }
 
+    public Location(android.location.Location location, String name, Integer mTimesVisited){
+        mID = UUID.randomUUID();
+        mDate = new Date();
+        nLatitude = location.getLatitude();
+        nLongitude = location.getLongitude();
+        nName = name;
+        this.mTimesVisited = mTimesVisited;
+    }
+
     public String getName() {
         return nName;
     }
