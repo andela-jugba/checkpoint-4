@@ -1,6 +1,8 @@
 package com.andela.checkpoint.onestep.fragments;
 
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -19,6 +21,14 @@ public class LocationFragment extends Fragment {
         // Required empty public constructor
     }
 
+    public static Intent newIntent(Context context){
+        return new Intent(context, LocationFragment.class);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
