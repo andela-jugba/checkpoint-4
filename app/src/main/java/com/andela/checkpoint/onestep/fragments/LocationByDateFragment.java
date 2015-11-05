@@ -64,5 +64,11 @@ public class LocationByDateFragment extends Fragment {
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUI();
+    }
+
 
 }

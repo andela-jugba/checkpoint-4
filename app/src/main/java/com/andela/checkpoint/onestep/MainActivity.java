@@ -1,10 +1,12 @@
 package com.andela.checkpoint.onestep;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,7 +19,7 @@ import android.widget.TextView;
 
 
 import com.andela.checkpoint.onestep.controllers.LocationListActivity;
-import com.andela.checkpoint.onestep.models.LocationHelper;
+import com.andela.checkpoint.onestep.database.TimePreference;
 import com.andela.checkpoint.onestep.services.TrackerService;
 import com.andressantibanez.ranger.Ranger;
 import com.dlazaro66.wheelindicatorview.WheelIndicatorItem;
@@ -25,7 +27,7 @@ import com.dlazaro66.wheelindicatorview.WheelIndicatorView;
 
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = MainActivity.class.getSimpleName() ;
+    private static final String TAG = MainActivity.class.getSimpleName();
     private WheelIndicatorView wheelIndicatorView;
     private CountDownTimer countDownTimer;
     private Button mButtonSetStep;
@@ -37,6 +39,21 @@ public class MainActivity extends AppCompatActivity {
     private View hiddenView;
     private TextView mCounter;
 
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                boolean update = bundle.getBoolean(TrackerService.RESULT, false);
+                if (update) {
+                    countDownTimer.cancel();
+                    countDownTimer.start();
+
+                }
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,9 +61,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
         setUpBasicUI();
-        LocationHelper locationHelper = LocationHelper.get(this);
 
     }
 
@@ -72,7 +87,11 @@ public class MainActivity extends AppCompatActivity {
         mButtonSetStep.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                hiddenView.setVisibility(View.VISIBLE);
+                int visibility = hiddenView.getVisibility();
+
+                if (visibility == View.VISIBLE) {
+                    hiddenView.setVisibility(View.INVISIBLE);
+                } else hiddenView.setVisibility(View.VISIBLE);
 
             }
         });
@@ -105,12 +124,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
         ranger = (Ranger) findViewById(R.id.listener_ranger);
-        ranger.setSelectedDay(5, false, 10l);
+//        ranger.setSelectedDay(5, false, 10l);
         ranger.setDayViewOnClickListener(new Ranger.DayViewOnClickListener() {
             @Override
             public void onDaySelected(int day) {
                 countDownTimer.cancel();
 
+                TimePreference.setStoredTime(getApplicationContext(), day);
                 countDownTimer = new CustomCountDown(day * 60 * 1000, 1000);
                 hiddenView.setVisibility(View.INVISIBLE);
 
@@ -125,7 +145,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void setUpCounter() {
         mCounter = (TextView) findViewById(R.id.textView);
-        countDownTimer = new CustomCountDown(300000, 1000);
+        int time = TimePreference.getStoredTime(getApplicationContext());
+        countDownTimer = new CustomCountDown(time * 60 * 1000, 1000);
     }
 
     private void setUpWheelIndicator() {
@@ -146,12 +167,12 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onTick(long l) {
-            int a = (int) l / 1000;
-            if (a > 999) {
+            int currentTime = (int) l / 1000;
+            if (currentTime > 999) {
                 mCounter.setTextSize(60);
             }
-            mCounter.setText("" + a);
-            int percent = (int) ((mStartTime - a) / mStartTime * 100);
+            mCounter.setText("" + currentTime);
+            int percent = (int) ((mStartTime - currentTime) / mStartTime * 100);
             wheelIndicatorView.setFilledPercent(percent + 1);
             wheelIndicatorView.notifyDataSetChanged();
         }
@@ -202,5 +223,17 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         Intent intent = TrackerService.newIntent(MainActivity.this);
         stopService(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(mBroadcastReceiver, new IntentFilter(TrackerService.NOTIFICATION));
+
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mBroadcastReceiver);
     }
 }
