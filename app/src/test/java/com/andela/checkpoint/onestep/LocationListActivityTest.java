@@ -39,8 +39,6 @@ public class LocationListActivityTest {
         testFragmentManager = testLocationListActivity.getSupportFragmentManager();
         testLocationListFragment = (LocationListFragment) testFragmentManager.findFragmentById(R.id.fragmentContainer);
 
-
-
     }
 
     @After

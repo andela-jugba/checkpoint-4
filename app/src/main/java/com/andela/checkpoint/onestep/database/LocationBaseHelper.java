@@ -21,7 +21,7 @@ public class LocationBaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("create table " + LocationTable.NAME+
+        sqLiteDatabase.execSQL("create table " + LocationTable.NAME +
                         "(" + " _id integer primary key autoincrement, "
                         + LocationTable.Cols.UUID + ", "
                         + LocationTable.Cols.NAME + ", "

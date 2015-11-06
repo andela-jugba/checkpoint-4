@@ -53,6 +53,14 @@ public class TrackerService extends Service implements
     private Geocoder geocoder;
     private CustomCountDown countDownTimer;
     private LocationHelper locationHelper;
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 1000 * 20;
+    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
+            UPDATE_INTERVAL_IN_MILLISECONDS / 2;
+    protected GoogleApiClient mGoogleApiClient;
+    protected LocationRequest mLocationRequest;
+    protected Location mCurrentLocation;
+    protected Boolean mRequestingLocationUpdates;
+
 
     public static Intent newIntent(Context context) {
         return new Intent(context, TrackerService.class);
@@ -101,16 +109,6 @@ public class TrackerService extends Service implements
 
     }
 
-
-    private boolean isNetworkAvailableAndConnected() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-        boolean isNetworkAvailable = cm.getActiveNetworkInfo() != null;
-        boolean isNetworkConnected = isNetworkAvailable &&
-                cm.getActiveNetworkInfo().isConnected();
-        getApplicationContext();
-        return isNetworkConnected;
-    }
-
     private String findLocationAddress(Location location) {
         String errorMessage = "";
         List<Address> addresses = null;
@@ -144,23 +142,8 @@ public class TrackerService extends Service implements
             return "UNKNOWN LOCATION";
         } else {
             Address address = addresses.get(0);
-//            if (addresses.size()> 0 ){
-//                Address add2 = addresses.get(1);
-//                ArrayList<String> addressFragments2 = new ArrayList<>();
-//                add2.getCountryName();
-//
-//                for (int i = 0; i < add2.getMaxAddressLineIndex(); i++){
-//                    addressFragments2.add(add2.getAddressLine(i));
-//                }
-//                addressFragments2.add(add2.getCountryName());
-//
-//                showToast(TextUtils.join(System.getProperty("line.separator"), addressFragments2));
-//            }
 
             ArrayList<String> addressFragments = new ArrayList<String>();
-
-
-
 
 
             for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
@@ -178,16 +161,6 @@ public class TrackerService extends Service implements
     protected void showToast(String text) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
-
-    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 1000 * 20;
-    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
-            UPDATE_INTERVAL_IN_MILLISECONDS / 2;
-    protected GoogleApiClient mGoogleApiClient;
-    protected LocationRequest mLocationRequest;
-    protected Location mCurrentLocation;
-    protected Boolean mRequestingLocationUpdates;
-
-
 
     protected synchronized void buildGoogleApiClient() {
         Log.i(TAG, "Building GoogleApiClient");

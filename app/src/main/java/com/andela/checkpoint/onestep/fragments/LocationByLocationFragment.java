@@ -39,7 +39,7 @@ public class LocationByLocationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View v =  inflater.inflate(R.layout.fragment_location_by_location, container, false);
+        View v = inflater.inflate(R.layout.fragment_location_by_location, container, false);
         recyclerView = (RecyclerView) v.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -63,6 +63,5 @@ public class LocationByLocationFragment extends Fragment {
         super.onResume();
         updateUI();
     }
-
 
 }

@@ -39,20 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private View hiddenView;
     private TextView mCounter;
 
-    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                boolean update = bundle.getBoolean(TrackerService.RESULT, false);
-                if (update) {
-                    countDownTimer.cancel();
-                    countDownTimer.start();
-
-                }
-            }
-        }
-    };
+    private BroadcastReceiver mBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +49,20 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         setUpBasicUI();
+        mBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Bundle bundle = intent.getExtras();
+                if (bundle != null) {
+                    boolean update = bundle.getBoolean(TrackerService.RESULT, false);
+                    if (update) {
+                        countDownTimer.cancel();
+                        countDownTimer.start();
+
+                    }
+                }
+            }
+        };
 
     }
 
@@ -184,29 +185,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return false;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return false;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     @Override
     public void onBackPressed() {
         if (mButtonSetStep.isEnabled()) {
@@ -231,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(mBroadcastReceiver, new IntentFilter(TrackerService.NOTIFICATION));
 
     }
+
     @Override
     protected void onPause() {
         super.onPause();
