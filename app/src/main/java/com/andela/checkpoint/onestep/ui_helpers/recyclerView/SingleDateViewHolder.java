@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.andela.checkpoint.onestep.R;
@@ -28,11 +29,13 @@ public class SingleDateViewHolder extends RecyclerView.ViewHolder implements Vie
     private List<Location> mlist;
 
     private View mRecycleViewHolder;
+    private View mainView;
 
     public SingleDateViewHolder(View itemView) {
         super(itemView);
+        mainView = itemView;
 
-        itemView.setOnClickListener(this);
+//        itemView.setOnClickListener(this);
 
         this.mRecyclerView = (RecyclerView) itemView.findViewById(R.id.recyclerView);
 
@@ -41,6 +44,7 @@ public class SingleDateViewHolder extends RecyclerView.ViewHolder implements Vie
         this.mContext = itemView.getContext();
         this.mRecycleViewHolder = itemView.findViewById(R.id.recyclerViewHolder);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+        mDate.setOnClickListener(this);
     }
 
     public void bindDate(String date, List<Location> list) {
@@ -66,11 +70,15 @@ public class SingleDateViewHolder extends RecyclerView.ViewHolder implements Vie
 
     @Override
     public void onClick(View view) {
-        if (mRecycleViewHolder.getVisibility() == View.INVISIBLE) {
+
+        if (mRecycleViewHolder.getVisibility() == View.GONE) {
             mRecycleViewHolder.setVisibility(View.VISIBLE);
+            mCount.setVisibility(View.VISIBLE);
+
         } else {
-            mRecycleViewHolder.setVisibility(View.INVISIBLE);
-            mRecycleViewHolder.animate();
+            mRecycleViewHolder.setVisibility(View.GONE);
+            mCount.setVisibility(View.INVISIBLE);
         }
+
     }
 }

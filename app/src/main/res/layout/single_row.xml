@@ -29,11 +29,11 @@
                 android:layout_marginRight="50dp"
                 />
             <TextView
-                android:id="@+id/currency_value"
+                android:id="@+id/value"
                 android:layout_width="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
-                android:text="dollar value"
+                android:text="value"
                 android:gravity="center"
                 android:textSize="12sp"
                 android:textColor="@color/white"

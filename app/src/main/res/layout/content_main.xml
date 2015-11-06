@@ -83,19 +83,53 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
-            android:orientation="horizontal"
-            android:visibility="gone">
+            android:orientation="vertical"
+            android:visibility="invisible">
 
-            <com.andressantibanez.ranger.Ranger
-                android:id="@+id/listener_ranger"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:scrollbarSize="4dp"
-                app:dayTextColor="#eeeeee"
-                app:daysContainerBackgroundColor="#73B05C"
-                app:displayDayOfWeek="false"
-                app:selectedDayBackgroundColor="#FFAA4D"
-                app:selectedDayTextColor="#444444" />
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_media_play" />
+
+                <com.andressantibanez.ranger.Ranger
+                    android:id="@+id/listener_ranger"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbarSize="4dp"
+                    app:dayTextColor="#eeeeee"
+                    app:daysContainerBackgroundColor="#73B05C"
+                    app:displayDayOfWeek="false"
+                    app:selectedDayBackgroundColor="#FFAA4D"
+                    app:selectedDayTextColor="#444444" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_media_play" />
+
+                <com.andressantibanez.ranger.Ranger
+                    android:id="@+id/listener_ranger_step_size"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbarSize="4dp"
+                    app:dayTextColor="#eeeeee"
+                    app:daysContainerBackgroundColor="#73B05C"
+                    app:displayDayOfWeek="false"
+                    app:selectedDayBackgroundColor="#FFAA4D"
+                    app:selectedDayTextColor="#444444" />
+            </LinearLayout>
+
         </LinearLayout>
 
         <TextView

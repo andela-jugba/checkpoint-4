@@ -11,7 +11,6 @@ import com.andela.checkpoint.onestep.models.Location;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,7 +47,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RowViewHolder> {
         Location items = itemsList.get(position);
         rowViewHolder.textView.setText(String.valueOf(items.getName()));
         DateFormat dateFormat = new SimpleDateFormat("EEEE dd,MMM,yyyy");
-        rowViewHolder.textViewCurrency.setText(dateFormat.format(items.getDate()));
+        rowViewHolder.textViewValue.setText(dateFormat.format(items.getDate()));
     }
 
 }

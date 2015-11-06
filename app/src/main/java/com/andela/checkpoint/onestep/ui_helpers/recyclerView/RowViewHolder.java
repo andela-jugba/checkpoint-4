@@ -13,13 +13,13 @@ import com.andela.checkpoint.onestep.R;
 
 public class RowViewHolder extends RecyclerView.ViewHolder {
 
-    TextView textViewCurrency;
+    TextView textViewValue;
     TextView textView;
 
     public RowViewHolder(View view) {
         super(view);
         this.textView = (TextView) view.findViewById(R.id.title);
-        this.textViewCurrency = (TextView) view.findViewById(R.id.currency_value);
+        this.textViewValue = (TextView) view.findViewById(R.id.value);
     }
 }
 

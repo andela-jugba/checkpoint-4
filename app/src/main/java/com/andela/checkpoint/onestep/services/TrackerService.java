@@ -23,7 +23,7 @@ import android.widget.Toast;
 
 import com.andela.checkpoint.onestep.R;
 import com.andela.checkpoint.onestep.controllers.LocationListActivity;
-import com.andela.checkpoint.onestep.fragments.LocationByLocationFragment;
+import com.andela.checkpoint.onestep.database.TimePreference;
 import com.andela.checkpoint.onestep.fragments.LocationFragment;
 import com.andela.checkpoint.onestep.models.LocationHelper;
 import com.google.android.gms.common.ConnectionResult;
@@ -33,9 +33,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import java.io.IOException;
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -46,8 +44,11 @@ public class TrackerService extends Service implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
+    public static final String RESULT = "result";
+    public static final String NOTIFICATION = "com.andela.checkpoint.onestep.receiver";
 
     private static final String TAG = "TrackerService";
+    public static final double STEP_SIZE = 5;
 
     private Geocoder geocoder;
     private CustomCountDown countDownTimer;
@@ -59,14 +60,15 @@ public class TrackerService extends Service implements
 
     public TrackerService() {
     }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // Let it continue running until it is stopped.
-        Toast.makeText(this, "Service Started", Toast.LENGTH_LONG).show();
+        int setTime = TimePreference.getStoredTime(getApplicationContext());
         startTracking(true);
-        countDownTimer = new CustomCountDown(60000, 1000);
+        countDownTimer = new CustomCountDown(setTime * 60 * 1000, 1000);
         return START_STICKY;
     }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -81,14 +83,6 @@ public class TrackerService extends Service implements
         return null;
     }
 
-    protected void onHandleIntent(Intent intent) {
-
-        if (!isNetworkAvailableAndConnected()) {
-            return;
-        }
-        Log.i(TAG, "Received an intent: " + intent);
-        startTracking(true);
-    }
 
     private void startTracking(boolean start) {
 
@@ -150,13 +144,29 @@ public class TrackerService extends Service implements
             return "UNKNOWN LOCATION";
         } else {
             Address address = addresses.get(0);
+//            if (addresses.size()> 0 ){
+//                Address add2 = addresses.get(1);
+//                ArrayList<String> addressFragments2 = new ArrayList<>();
+//                add2.getCountryName();
+//
+//                for (int i = 0; i < add2.getMaxAddressLineIndex(); i++){
+//                    addressFragments2.add(add2.getAddressLine(i));
+//                }
+//                addressFragments2.add(add2.getCountryName());
+//
+//                showToast(TextUtils.join(System.getProperty("line.separator"), addressFragments2));
+//            }
+
             ArrayList<String> addressFragments = new ArrayList<String>();
 
 
-            address.getCountryName();
+
+
+
             for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
                 addressFragments.add(address.getAddressLine(i));
             }
+
             addressFragments.add(address.getCountryName());
 
 
@@ -169,40 +179,14 @@ public class TrackerService extends Service implements
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 
-
-    /**
-     * The desired interval for location updates. Inexact. Updates may be more or less frequent.
-     */
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 1000 * 20;
-
-    /**
-     * The fastest rate for active location updates. Exact. Updates will never be more frequent
-     * than this value.
-     */
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
             UPDATE_INTERVAL_IN_MILLISECONDS / 2;
-
-    protected final static String LOCATION_KEY = "location-key";
-
-    /**
-     * Provides the entry point to Google Play services.
-     */
     protected GoogleApiClient mGoogleApiClient;
-
-    /**
-     * Stores parameters for requests to the FusedLocationProviderApi.
-     */
     protected LocationRequest mLocationRequest;
-
-    /**
-     * Represents a geographical location.
-     */
     protected Location mCurrentLocation;
-
-
     protected Boolean mRequestingLocationUpdates;
 
-    protected String mLastUpdateTime;
 
 
     protected synchronized void buildGoogleApiClient() {
@@ -217,20 +201,10 @@ public class TrackerService extends Service implements
 
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-
-        // Sets the desired interval for active location updates. This interval is
-        // inexact. You may not receive updates at all if no location sources are available, or
-        // you may receive them slower than requested. You may also receive updates faster than
-        // requested if other applications are requesting location at a faster interval.
         mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
-
-        // Sets the fastest rate for active location updates. This interval is exact, and your
-        // application will never receive updates faster than this value.
         mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
-
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
-
 
 
     protected void startLocationUpdates() {
@@ -256,9 +230,6 @@ public class TrackerService extends Service implements
         }
     }
 
-    /**
-     * Callback that fires when the location changes.
-     */
     @Override
     public void onLocationChanged(Location location) {
 
@@ -278,8 +249,6 @@ public class TrackerService extends Service implements
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
-        // onConnectionFailed.
         Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
     }
 
@@ -287,7 +256,6 @@ public class TrackerService extends Service implements
     public void onDestroy() {
         super.onDestroy();
         startTracking(false);
-        Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
         countDownTimer.cancel();
     }
 
@@ -307,14 +275,16 @@ public class TrackerService extends Service implements
         @Override
         public void onTick(long l) {
             int a = (int) l / 1000;
+            if (temLocation == null) {
+                temLocation = mCurrentLocation;
+            }
+            if (a % 10 == 0) {
 
-            if(a%10 == 0){
-                if(temLocation == null){
-                    temLocation = mCurrentLocation;
-                }
                 distanceInMeters = temLocation.distanceTo(mCurrentLocation);
-                Toast.makeText(getApplicationContext(), distanceInMeters+"", Toast.LENGTH_LONG).show();
-                if(distanceInMeters > 25.0){
+                Toast.makeText(getApplicationContext(), distanceInMeters + "", Toast.LENGTH_LONG).show();
+                if (distanceInMeters > STEP_SIZE) {
+                    temLocation = mCurrentLocation;
+                    updateUICounter(true);
                     this.cancel();
                     this.start();
                 }
@@ -325,28 +295,38 @@ public class TrackerService extends Service implements
         public void onFinish() {
             String locationName = findLocationAddress(temLocation);
             com.andela.checkpoint.onestep.models.Location location = new
-                    com.andela.checkpoint.onestep.models.Location(temLocation,locationName, (int) mStartTime);
+                    com.andela.checkpoint.onestep.models.Location(temLocation, locationName, (int) mStartTime);
             locationHelper.addLocation(location);
 
             // send notifications
-            Resources resources = getResources();
-
-            Intent i = LocationFragment.newIntent(getApplicationContext());
-            Intent intent = new Intent(getApplicationContext(), LocationListActivity.class);
-            PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
-            Notification notification = new NotificationCompat.Builder(getBaseContext())
-                    .setTicker(resources.getString(R.string.new_pictures_title))
-                    .setSmallIcon(R.drawable.ic_location_recorded)
-                    .setContentTitle(resources.getString(R.string.new_pictures_title))
-                    .setContentText(resources.getString(R.string.new_pictures_text))
-                    .setContentIntent(pi)
-                    .setAutoCancel(true)
-                    .build();
-            NotificationManagerCompat notificationManager =
-                    NotificationManagerCompat.from(getBaseContext());
-            notificationManager.notify(0, notification);
+            sendNotifications();
             this.start();
         }
+    }
+
+    private void sendNotifications() {
+        Resources resources = getResources();
+
+        Intent i = LocationFragment.newIntent(getApplicationContext());
+        Intent intent = new Intent(getApplicationContext(), LocationListActivity.class);
+        PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
+        Notification notification = new NotificationCompat.Builder(getBaseContext())
+                .setTicker(resources.getString(R.string.new_pictures_title))
+                .setSmallIcon(R.drawable.ic_location_recorded)
+                .setContentTitle(resources.getString(R.string.new_pictures_title))
+                .setContentText(resources.getString(R.string.new_pictures_text))
+                .setContentIntent(pi)
+                .setAutoCancel(true)
+                .build();
+        NotificationManagerCompat notificationManager =
+                NotificationManagerCompat.from(getBaseContext());
+        notificationManager.notify(0, notification);
+    }
+
+    private void updateUICounter(boolean result) {
+        Intent intent = new Intent(NOTIFICATION);
+        intent.putExtra(RESULT, result);
+        sendBroadcast(intent);
     }
 
 
