@@ -61,23 +61,31 @@ public class LocationTest {
         testLocationThree.setLongitude(7.88);
         testLocationThree.setTimesVisited(1);
 
+        testLocationHelper.addLocation(testLocationOne);
+        testLocationHelper.addLocation(testLocationTwo);
+        testLocationHelper.addLocation(testLocationThree);
 
     }
 
     @After
     public void tearDown() throws Exception {
         testMainActivity = null;
+        testLocationHelper.deleteLocation(testLocationOne);
+        testLocationHelper.deleteLocation(testLocationTwo);
+        testLocationHelper.deleteLocation(testLocationThree);
 
     }
 
     @Test
     public void testLocationSavesAndDeletes() throws Exception {
-        List<Location> locations = testLocationHelper.getLocations();
-        assertNull("Should be null", locations);
+        List<Location> locations;
 
-        testLocationHelper.addLocation(testLocationOne);
-        testLocationHelper.addLocation(testLocationTwo);
-        testLocationHelper.addLocation(testLocationThree);
+        HashMap<String, List<Location>> places = testLocationHelper.getLocationByPlaceName();
+        assertEquals("Should be 3", places.size(), 3, 0.0);
+
+        for (Map.Entry<String, List<Location>> entry : places.entrySet()) {
+            assertEquals(entry.getValue().size(), 1.0, 0.0);
+        }
 
         locations = testLocationHelper.getLocations();
         assertEquals("Should be three", locations.size(), 3, 0.0);
@@ -106,6 +114,8 @@ public class LocationTest {
         for (Map.Entry<String, List<Location>> entry : dates.entrySet()) {
             assertEquals(entry.getValue().size(), 1.0, 0.0);
         }
+
     }
+
 
 }

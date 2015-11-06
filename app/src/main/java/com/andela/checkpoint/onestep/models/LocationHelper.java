@@ -40,26 +40,6 @@ public class LocationHelper {
         mContext = context.getApplicationContext();
         mDatabase = new LocationBaseHelper(mContext).getWritableDatabase();
 
-//        Location testLocationOne = new Location();
-//        testLocationOne.setName("M55");
-//        testLocationOne.setLatitude(6.777);
-//        testLocationOne.setLongitude(5.66);
-//        testLocationOne.setTimesVisited(1);
-//        this.addLocation(testLocationOne);
-//
-//        Location testLocationTwo = new Location();
-//        testLocationTwo.setName("Yaba");
-//        testLocationTwo.setLatitude(6.567);
-//        testLocationTwo.setLongitude(5.645);
-//        testLocationTwo.setTimesVisited(1);
-//        this.addLocation(testLocationTwo);
-//
-//        Location testLocationThree = new Location();
-//        testLocationThree.setName("Amity");
-//        testLocationThree.setLatitude(7.8);
-//        testLocationThree.setLongitude(7.88);
-//        testLocationThree.setTimesVisited(1);
-//        this.addLocation(testLocationThree);
     }
 
     public Location getLocation(UUID id) {
@@ -122,6 +102,7 @@ public class LocationHelper {
 
     /**
      * Queries for all locations in the Db
+     *
      * @return a List of locations
      */
     public List<Location> getLocations() {
@@ -144,9 +125,10 @@ public class LocationHelper {
 
     /**
      * Queries for unique date
+     *
      * @return a set of dates
      */
-    public HashMap<String, List<Location>> getLocationByDate(){
+    public HashMap<String, List<Location>> getLocationByDate() {
         DateCriterion dateCriteria = new DateCriterion();
         Set<String> dates = new HashSet<>();
         List<Location> locations = new ArrayList<>();
@@ -168,16 +150,52 @@ public class LocationHelper {
             cursor.close();
         }
 
-        for (String date: dates){
-            List<Location> tempLocations = dateCriteria.meetCriteria(locations,date);
-            locationByDate.put(date,tempLocations);
+        for (String date : dates) {
+            List<Location> tempLocations = dateCriteria.meetCriteria(locations, date);
+            locationByDate.put(date, tempLocations);
         }
 
         return locationByDate;
     }
 
     /**
+     * Querys of locations by Place Name
+     *
+     * @return
+     */
+
+    public HashMap<String, List<Location>> getLocationByPlaceName() {
+        PlaceCriterion placeCriterion = new PlaceCriterion();
+        Set<String> places = new HashSet<>();
+        List<Location> locations = new ArrayList<>();
+
+        HashMap<String, List<Location>> locationByPlaceName = new HashMap<>();
+
+        LocationCursorWrapper cursor = queryLocation(null, null);
+        try {
+            if (cursor.getCount() == 0) return null;
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                Location temp = cursor.getLocation();
+                places.add(temp.getName());
+                locations.add(temp);
+                cursor.moveToNext();
+            }
+        } finally {
+            cursor.close();
+        }
+
+        for (String place : places) {
+            List<Location> tempLocations = placeCriterion.meetCriteria(locations, place);
+            locationByPlaceName.put(place, tempLocations);
+        }
+
+        return locationByPlaceName;
+    }
+
+    /**
      * deletes a location from the DB
+     *
      * @param location
      */
     public void deleteLocation(Location location) {
@@ -187,7 +205,6 @@ public class LocationHelper {
         mDatabase.delete(LocationTable.NAME, LocationTable.Cols.UUID + " = ?",
                 new String[]{uuidString});
     }
-
 
 
 }
