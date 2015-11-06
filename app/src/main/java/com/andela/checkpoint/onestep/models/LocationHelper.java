@@ -36,10 +36,31 @@ public class LocationHelper {
         return sLocationHelper;
     }
 
-    public LocationHelper(Context context) {
+    private LocationHelper(Context context) {
         mContext = context.getApplicationContext();
         mDatabase = new LocationBaseHelper(mContext).getWritableDatabase();
 
+        Location testLocationOne = new Location();
+        testLocationOne.setName("M55");
+        testLocationOne.setLatitude(6.777);
+        testLocationOne.setLongitude(5.66);
+        testLocationOne.setTimesVisited(1);
+
+        Location testLocationTwo = new Location();
+        testLocationTwo.setName("Yaba");
+        testLocationTwo.setLatitude(6.567);
+        testLocationTwo.setLongitude(5.645);
+        testLocationTwo.setTimesVisited(1);
+
+        Location testLocationThree = new Location();
+        testLocationThree.setName("Amity");
+        testLocationThree.setLatitude(7.8);
+        testLocationThree.setLongitude(7.88);
+        testLocationThree.setTimesVisited(1);
+
+        this.addLocation(testLocationOne);
+        this.addLocation(testLocationTwo);
+        this.addLocation(testLocationThree);
     }
 
     public Location getLocation(UUID id) {

@@ -38,6 +38,7 @@ public class LocationByDateFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLocationHelper = LocationHelper.get(getActivity());
+
     }
 
     @Override
@@ -50,6 +51,7 @@ public class LocationByDateFragment extends Fragment {
 
         updateUI();
         return view;
+
     }
 
 
@@ -69,6 +71,5 @@ public class LocationByDateFragment extends Fragment {
         super.onResume();
         updateUI();
     }
-
 
 }

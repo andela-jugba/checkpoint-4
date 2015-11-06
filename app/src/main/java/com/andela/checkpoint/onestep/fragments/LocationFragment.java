@@ -21,7 +21,7 @@ public class LocationFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static Intent newIntent(Context context){
+    public static Intent newIntent(Context context) {
         return new Intent(context, LocationFragment.class);
     }
 
@@ -36,6 +36,5 @@ public class LocationFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_location, container, false);
         return view;
     }
-
 
 }
