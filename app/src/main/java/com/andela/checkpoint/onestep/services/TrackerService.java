@@ -153,7 +153,7 @@ public class TrackerService extends Service implements
             addressFragments.add(address.getCountryName());
 
 
-            showToast(TextUtils.join(System.getProperty("line.separator"), addressFragments));
+//            showToast(TextUtils.join(System.getProperty("line.separator"), addressFragments));
             return TextUtils.join(System.getProperty("line.separator"), addressFragments);
         }
     }
@@ -209,8 +209,8 @@ public class TrackerService extends Service implements
         mCurrentLocation = location;
         if (location != null) {
             findLocationAddress(location);
-            Toast.makeText(this, "Longitude " + mCurrentLocation.getLongitude() + " Latitude " +
-                    mCurrentLocation.getLatitude(), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "Longitude " + mCurrentLocation.getLongitude() + " Latitude " +
+//                    mCurrentLocation.getLatitude(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -254,7 +254,7 @@ public class TrackerService extends Service implements
             if (a % 10 == 0) {
 
                 distanceInMeters = temLocation.distanceTo(mCurrentLocation);
-                Toast.makeText(getApplicationContext(), distanceInMeters + "", Toast.LENGTH_LONG).show();
+//                Toast.makeText(getApplicationContext(), distanceInMeters + "", Toast.LENGTH_LONG).show();
                 if (distanceInMeters > STEP_SIZE) {
                     temLocation = mCurrentLocation;
                     updateUICounter(true);
