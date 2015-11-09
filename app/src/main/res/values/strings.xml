@@ -14,4 +14,10 @@
     <string name="no_address_found">No Address found!</string>
     <string name="new_pictures_title">New Location Recorded</string>
     <string name="new_pictures_text">View details now</string>
+    <string name="app_start">start</string>
+    <string name="app_stop">stop</string>
+    <string name="app_step_set">"Step set for: "</string>
+    <string name="app_minute">" minute"</string>
+    <string name="app_minutes">" minutes"</string>
+    <string name="app_tracking">Tracking...</string>
 </resources>

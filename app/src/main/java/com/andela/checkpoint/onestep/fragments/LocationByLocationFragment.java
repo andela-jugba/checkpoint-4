@@ -10,19 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.andela.checkpoint.onestep.R;
-import com.andela.checkpoint.onestep.models.Location;
 import com.andela.checkpoint.onestep.models.LocationHelper;
 import com.andela.checkpoint.onestep.ui_helpers.recyclerView.RecyclerViewAdapter;
-
-import java.util.ArrayList;
-import java.util.Currency;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class LocationByLocationFragment extends Fragment {
-    RecyclerView recyclerView;
-    RecyclerViewAdapter adapter;
+    RecyclerView mRecyclerView;
+    RecyclerViewAdapter mAdapter;
     LocationHelper mLocationHelper;
 
     public LocationByLocationFragment() {
@@ -40,22 +36,20 @@ public class LocationByLocationFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_location_by_location, container, false);
-        recyclerView = (RecyclerView) v.findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView = (RecyclerView) v.findViewById(R.id.recyclerView);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         updateUI();
         return v;
     }
 
     private void updateUI() {
-        if (adapter == null) {
-            adapter = new RecyclerViewAdapter(getContext(), mLocationHelper.getLocations());
-            recyclerView.setAdapter(adapter);
-
+        if (mAdapter == null) {
+            mAdapter = new RecyclerViewAdapter(getContext(), mLocationHelper.getLocations());
+            mRecyclerView.setAdapter(mAdapter);
         } else {
-            adapter.notifyDataSetChanged();
+            mAdapter.notifyDataSetChanged();
         }
-
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.andela.checkpoint.onestep;
+package com.andela.checkpoint.onestep.controllers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,13 +12,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
 
-import com.andela.checkpoint.onestep.controllers.LocationListActivity;
+import com.andela.checkpoint.onestep.R;
 import com.andela.checkpoint.onestep.database.TimePreference;
 import com.andela.checkpoint.onestep.services.TrackerService;
 import com.andressantibanez.ranger.Ranger;
@@ -28,15 +26,15 @@ import com.dlazaro66.wheelindicatorview.WheelIndicatorView;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-    private WheelIndicatorView wheelIndicatorView;
-    private CountDownTimer countDownTimer;
+    private WheelIndicatorView mWheelIndicatorView;
+    private CountDownTimer mCountDownTimer;
     private Button mButtonSetStep;
-    private Button buttonPlay;
-    private Button mbuttonLogs;
-    private TextView textViewStart;
-    private Ranger ranger;
+    private Button mButtonPlay;
+    private Button mButtonLogs;
+    private TextView mTextViewStart;
+    private Ranger mRanger;
 
-    private View hiddenView;
+    private View mHiddenView;
     private TextView mCounter;
 
     private BroadcastReceiver mBroadcastReceiver;
@@ -56,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
                 if (bundle != null) {
                     boolean update = bundle.getBoolean(TrackerService.RESULT, false);
                     if (update) {
-                        countDownTimer.cancel();
-                        countDownTimer.start();
+                        mCountDownTimer.cancel();
+                        mCountDownTimer.start();
 
                     }
                 }
@@ -70,8 +68,8 @@ public class MainActivity extends AppCompatActivity {
         setUpWheelIndicator();
         setUpCounter();
 
-        mbuttonLogs = (Button) findViewById(R.id.buttonLog);
-        mbuttonLogs.setOnClickListener(new View.OnClickListener() {
+        mButtonLogs = (Button) findViewById(R.id.buttonLog);
+        mButtonLogs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, LocationListActivity.class);
@@ -83,32 +81,32 @@ public class MainActivity extends AppCompatActivity {
 
 
         mButtonSetStep = (Button) findViewById(R.id.buttonSetStep);
-        hiddenView = findViewById(R.id.hiddenView);
+        mHiddenView = findViewById(R.id.hiddenView);
 
         mButtonSetStep.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int visibility = hiddenView.getVisibility();
+                int visibility = mHiddenView.getVisibility();
 
                 if (visibility == View.VISIBLE) {
-                    hiddenView.setVisibility(View.INVISIBLE);
-                } else hiddenView.setVisibility(View.VISIBLE);
+                    mHiddenView.setVisibility(View.INVISIBLE);
+                } else mHiddenView.setVisibility(View.VISIBLE);
 
             }
         });
 
 
-        buttonPlay = (Button) findViewById(R.id.buttonPlay);
-        buttonPlay.setVisibility(View.INVISIBLE);
-        textViewStart = (TextView) findViewById(R.id.textViewPlay);
-        textViewStart.setOnClickListener(new View.OnClickListener() {
+        mButtonPlay = (Button) findViewById(R.id.buttonPlay);
+        mButtonPlay.setVisibility(View.INVISIBLE);
+        mTextViewStart = (TextView) findViewById(R.id.textViewPlay);
+        mTextViewStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = TrackerService.newIntent(MainActivity.this);
                 if (mButtonSetStep.isEnabled()) {
                     mButtonSetStep.setEnabled(false);
-                    countDownTimer.start();
-                    textViewStart.setText("stop");
+                    mCountDownTimer.start();
+                    mTextViewStart.setText(R.string.app_stop);
                     intent.putExtra("start", true);
                     startService(intent);
                     return;
@@ -116,30 +114,32 @@ public class MainActivity extends AppCompatActivity {
 
                 stopService(intent);
                 Log.i(TAG, "service should be stopped");
-                countDownTimer.cancel();
-                textViewStart.setText("start");
+                mCountDownTimer.cancel();
+                mTextViewStart.setText(R.string.app_start);
                 mButtonSetStep.setEnabled(true);
 
 
             }
         });
 
-        ranger = (Ranger) findViewById(R.id.listener_ranger);
-        ranger.setSelectedDay(5, false, 10l);
-        ranger.setDayViewOnClickListener(new Ranger.DayViewOnClickListener() {
+        mRanger = (Ranger) findViewById(R.id.listener_ranger);
+        int time = TimePreference.getStoredTime(getApplicationContext());
+
+        mRanger.setSelectedDay(time, false, Ranger.DELAY_SELECTION);
+        mRanger.setDayViewOnClickListener(new Ranger.DayViewOnClickListener() {
             @Override
             public void onDaySelected(int day) {
-                countDownTimer.cancel();
+                mCountDownTimer.cancel();
 
                 TimePreference.setStoredTime(getApplicationContext(), day);
-                countDownTimer = new CustomCountDown(day * 60 * 1000, 1000);
-                hiddenView.setVisibility(View.INVISIBLE);
+                mCountDownTimer = new CustomCountDown(day * 60 * 1000, 1000);
+                mHiddenView.setVisibility(View.INVISIBLE);
 
                 View parentLayout = findViewById(android.R.id.content);
                 if (day == 1) {
-                    Snackbar.make(parentLayout, "Step set for: " + day + " min", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(parentLayout, getString(R.string.app_step_set) + day + getString(R.string.app_minute), Snackbar.LENGTH_SHORT).show();
                 } else
-                    Snackbar.make(parentLayout, "Step set for: " + day + " mins", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(parentLayout, getString(R.string.app_step_set) + day + getString(R.string.app_minutes), Snackbar.LENGTH_SHORT).show();
             }
         });
     }
@@ -147,14 +147,14 @@ public class MainActivity extends AppCompatActivity {
     private void setUpCounter() {
         mCounter = (TextView) findViewById(R.id.textView);
         int time = TimePreference.getStoredTime(getApplicationContext());
-        countDownTimer = new CustomCountDown(time * 60 * 1000, 1000);
+        mCountDownTimer = new CustomCountDown(time * 60 * 1000, 1000);
     }
 
     private void setUpWheelIndicator() {
-        wheelIndicatorView = (WheelIndicatorView) findViewById(R.id.wheel_indicator_view);
-        wheelIndicatorView.setFilledPercent(0);
+        mWheelIndicatorView = (WheelIndicatorView) findViewById(R.id.wheel_indicator_view);
+        mWheelIndicatorView.setFilledPercent(0);
         WheelIndicatorItem timeProgressIndicator = new WheelIndicatorItem(0.1f, Color.parseColor("#62B9D5"));
-        wheelIndicatorView.addWheelIndicatorItem(timeProgressIndicator);
+        mWheelIndicatorView.addWheelIndicatorItem(timeProgressIndicator);
     }
 
     public class CustomCountDown extends CountDownTimer {
@@ -174,8 +174,8 @@ public class MainActivity extends AppCompatActivity {
             }
             mCounter.setText("" + currentTime);
             int percent = (int) ((mStartTime - currentTime) / mStartTime * 100);
-            wheelIndicatorView.setFilledPercent(percent + 1);
-            wheelIndicatorView.notifyDataSetChanged();
+            mWheelIndicatorView.setFilledPercent(percent + 1);
+            mWheelIndicatorView.notifyDataSetChanged();
         }
 
         @Override
@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
         View parentLayout = findViewById(android.R.id.content);
-        Snackbar.make(parentLayout, "Tracking...", Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(parentLayout, R.string.app_tracking, Snackbar.LENGTH_SHORT).show();
 
     }
 

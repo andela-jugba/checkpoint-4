@@ -10,7 +10,6 @@ import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
@@ -46,16 +45,16 @@ public class TrackerService extends Service implements
 
     public static final String RESULT = "result";
     public static final String NOTIFICATION = "com.andela.checkpoint.onestep.receiver";
-
     private static final String TAG = "TrackerService";
-    public static final double STEP_SIZE = 5;
-
-    private Geocoder geocoder;
-    private CustomCountDown countDownTimer;
-    private LocationHelper locationHelper;
+    public static final double STEP_SIZE = 50;
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 1000 * 20;
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
             UPDATE_INTERVAL_IN_MILLISECONDS / 2;
+    private Geocoder mGeocoder;
+    private CustomCountDown mCountDownTimer;
+    private LocationHelper mLocationHelper;
+    private AddressFinder mAddressFinder;
+
     protected GoogleApiClient mGoogleApiClient;
     protected LocationRequest mLocationRequest;
     protected Location mCurrentLocation;
@@ -73,15 +72,16 @@ public class TrackerService extends Service implements
     public int onStartCommand(Intent intent, int flags, int startId) {
         int setTime = TimePreference.getStoredTime(getApplicationContext());
         startTracking(true);
-        countDownTimer = new CustomCountDown(setTime * 60 * 1000, 1000);
+        mCountDownTimer = new CustomCountDown(setTime * 60 * 1000, 1000);
         return START_STICKY;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        geocoder = new Geocoder(this, Locale.getDefault());
-        locationHelper = LocationHelper.get(getApplicationContext());
+        mGeocoder = new Geocoder(this, Locale.getDefault());
+        mAddressFinder = new AddressFinder(mGeocoder);
+        mLocationHelper = LocationHelper.get(getApplicationContext());
     }
 
     @Nullable
@@ -109,54 +109,6 @@ public class TrackerService extends Service implements
 
     }
 
-    private String findLocationAddress(Location location) {
-        String errorMessage = "";
-        List<Address> addresses = null;
-
-        try {
-            addresses = geocoder.getFromLocation(
-                    location.getLatitude(),
-                    location.getLongitude(),
-                    // In this sample, we get just a single address.
-                    1);
-        } catch (IOException ioException) {
-            // Catch network or other I/O problems.
-            errorMessage = getString(R.string.service_not_available);
-            Log.e(TAG, errorMessage, ioException);
-        } catch (IllegalArgumentException illegalArgumentException) {
-            // Catch invalid latitude or longitude values.
-            errorMessage = getString(R.string.invalid_lat_long_used);
-            Log.e(TAG, errorMessage + ". " +
-                    "Latitude = " + location.getLatitude() +
-                    ", Longitude = " + location.getLongitude(), illegalArgumentException);
-        }
-
-        // Handle case where no address was found.
-        if (addresses == null || addresses.size() == 0) {
-            if (errorMessage.isEmpty()) {
-                errorMessage = getString(R.string.no_address_found);
-                Log.e(TAG, errorMessage);
-                showToast("No address found!");
-
-            }
-            return "UNKNOWN LOCATION";
-        } else {
-            Address address = addresses.get(0);
-
-            ArrayList<String> addressFragments = new ArrayList<String>();
-
-
-            for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
-                addressFragments.add(address.getAddressLine(i));
-            }
-
-            addressFragments.add(address.getCountryName());
-
-
-//            showToast(TextUtils.join(System.getProperty("line.separator"), addressFragments));
-            return TextUtils.join(System.getProperty("line.separator"), addressFragments);
-        }
-    }
 
     protected void showToast(String text) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
@@ -208,9 +160,7 @@ public class TrackerService extends Service implements
 
         mCurrentLocation = location;
         if (location != null) {
-            findLocationAddress(location);
-//            Toast.makeText(this, "Longitude " + mCurrentLocation.getLongitude() + " Latitude " +
-//                    mCurrentLocation.getLatitude(), Toast.LENGTH_SHORT).show();
+            mAddressFinder.findLocationAddress(location);
         }
     }
 
@@ -229,21 +179,20 @@ public class TrackerService extends Service implements
     public void onDestroy() {
         super.onDestroy();
         startTracking(false);
-        countDownTimer.cancel();
+        mCountDownTimer.cancel();
     }
 
-    public class CustomCountDown extends CountDownTimer {
+    private class CustomCountDown extends CountDownTimer {
         private double mStartTime;
         private Location temLocation;
         private float distanceInMeters;
 
         public CustomCountDown(long startTime, long interval) {
             super(startTime, interval);
-            mStartTime = startTime / 1000;
+            mStartTime = startTime / (1000*60);
             temLocation = mCurrentLocation;
             this.start();
         }
-
 
         @Override
         public void onTick(long l) {
@@ -254,7 +203,6 @@ public class TrackerService extends Service implements
             if (a % 10 == 0) {
 
                 distanceInMeters = temLocation.distanceTo(mCurrentLocation);
-//                Toast.makeText(getApplicationContext(), distanceInMeters + "", Toast.LENGTH_LONG).show();
                 if (distanceInMeters > STEP_SIZE) {
                     temLocation = mCurrentLocation;
                     updateUICounter(true);
@@ -266,10 +214,10 @@ public class TrackerService extends Service implements
 
         @Override
         public void onFinish() {
-            String locationName = findLocationAddress(temLocation);
+            String locationName = mAddressFinder.findLocationAddress(temLocation);
             com.andela.checkpoint.onestep.models.Location location = new
                     com.andela.checkpoint.onestep.models.Location(temLocation, locationName, (int) mStartTime);
-            locationHelper.addLocation(location);
+            mLocationHelper.addLocation(location);
 
             // send notifications
             sendNotifications();
@@ -301,6 +249,5 @@ public class TrackerService extends Service implements
         intent.putExtra(RESULT, result);
         sendBroadcast(intent);
     }
-
 
 }

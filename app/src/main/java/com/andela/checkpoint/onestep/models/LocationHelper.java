@@ -7,15 +7,15 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.andela.checkpoint.onestep.database.LocationBaseHelper;
 import com.andela.checkpoint.onestep.database.LocationCursorWrapper;
-import com.andela.checkpoint.onestep.database.LocationDbSchema;
+import com.bignerdranch.expandablerecyclerview.Model.ParentObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -40,27 +40,6 @@ public class LocationHelper {
         mContext = context.getApplicationContext();
         mDatabase = new LocationBaseHelper(mContext).getWritableDatabase();
 
-        Location testLocationOne = new Location();
-        testLocationOne.setName("M55");
-        testLocationOne.setLatitude(6.777);
-        testLocationOne.setLongitude(5.66);
-        testLocationOne.setTimesVisited(1);
-
-        Location testLocationTwo = new Location();
-        testLocationTwo.setName("Yaba");
-        testLocationTwo.setLatitude(6.567);
-        testLocationTwo.setLongitude(5.645);
-        testLocationTwo.setTimesVisited(1);
-
-        Location testLocationThree = new Location();
-        testLocationThree.setName("Amity");
-        testLocationThree.setLatitude(7.8);
-        testLocationThree.setLongitude(7.88);
-        testLocationThree.setTimesVisited(1);
-
-        this.addLocation(testLocationOne);
-        this.addLocation(testLocationTwo);
-        this.addLocation(testLocationThree);
     }
 
     public Location getLocation(UUID id) {
@@ -88,7 +67,7 @@ public class LocationHelper {
         values.put(LocationTable.Cols.DATE, location.getDate().getTime());
         values.put(LocationTable.Cols.LONGITUDE, location.getLongitude());
         values.put(LocationTable.Cols.LATITUDE, location.getLatitude());
-        values.put(LocationTable.Cols.TIMES_VISITED, location.getTimesVisted());
+        values.put(LocationTable.Cols.TIMES_VISITED, location.getTimesVisited());
         return values;
     }
 
@@ -149,6 +128,29 @@ public class LocationHelper {
      *
      * @return a set of dates
      */
+
+    public ArrayList<ParentObject> getParentedLocation() {
+        ArrayList<ParentObject> parentObjects = new ArrayList<>();
+        HashMap<String, List<Location>> locationByDate = getLocationByDate();
+        if (locationByDate == null) return null;
+
+        for (Map.Entry<String, List<Location>> entry : locationByDate.entrySet()) {
+            int num = entry.getValue().size();
+            LocationParent locationParent = new LocationParent();
+            locationParent.setDate(entry.getValue().get(0).getDate());
+            locationParent.setCount(num);
+
+            List<Object> places = new ArrayList<>();
+            for (int i = 0; i < num; i++) {
+                Location location = entry.getValue().get(i);
+                places.add(location);
+            }
+            locationParent.setChildObjectList(places);
+            parentObjects.add(locationParent);
+        }
+        return parentObjects;
+    }
+
     public HashMap<String, List<Location>> getLocationByDate() {
         DateCriterion dateCriteria = new DateCriterion();
         Set<String> dates = new HashSet<>();
@@ -222,7 +224,6 @@ public class LocationHelper {
     public void deleteLocation(Location location) {
         String uuidString = location.getID().toString();
 
-        ContentValues values = getContentValues(location);
         mDatabase.delete(LocationTable.NAME, LocationTable.Cols.UUID + " = ?",
                 new String[]{uuidString});
     }

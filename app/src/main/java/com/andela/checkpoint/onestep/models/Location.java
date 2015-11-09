@@ -1,12 +1,13 @@
 package com.andela.checkpoint.onestep.models;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
  * Created by andela-jugba on 11/2/15.
  */
-public class Location {
+public class Location extends Object{
     private String nName;
     private double nLongitude;
     private double nLatitude;
@@ -70,7 +71,7 @@ public class Location {
     }
 
 
-    public int getTimesVisted() {
+    public int getTimesVisited() {
         return mTimesVisited;
     }
 
