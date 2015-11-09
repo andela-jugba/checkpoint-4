@@ -28,11 +28,7 @@ public class LocationChildViewHolder extends ChildViewHolder implements View.OnC
 
     @Override
     public void onClick(View view) {
-        showToast("This works! " + mUuid, view.getContext());
-    }
 
-    protected void showToast(String text, Context context) {
-        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
     }
 
     public void bindUuid(UUID uuid) {

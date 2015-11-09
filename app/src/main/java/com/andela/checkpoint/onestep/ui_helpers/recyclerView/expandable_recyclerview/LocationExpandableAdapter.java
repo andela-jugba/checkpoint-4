@@ -20,6 +20,10 @@ import java.util.List;
 public class LocationExpandableAdapter extends ExpandableRecyclerAdapter<LocationParentViewHolder, LocationChildViewHolder> {
     private LayoutInflater mInflater;
     private List<Object> mList;
+    private final String MIN = "minute";
+    private final String MINS = "minutes";
+    private final String LOCATION = "Location";
+    private final String LOCATIONS = "Locations";
 
     public LocationExpandableAdapter(Context context, List parentItemList) {
         super(context, parentItemList);
@@ -44,14 +48,21 @@ public class LocationExpandableAdapter extends ExpandableRecyclerAdapter<Locatio
         LocationParent location = (LocationParent) parentObject;
         DateFormat dateFormat = new SimpleDateFormat("EEEE dd,MMM,yyyy");
         locationParentViewHolder.mDate.setText(dateFormat.format(location.getDate()));
-        locationParentViewHolder.mCount.setText(String.valueOf(location.getCount()));
+        if (location.getCount() == 1) {
+            locationParentViewHolder.mCount.setText(String.valueOf(location.getCount()) + " " + LOCATION);
+        } else
+            locationParentViewHolder.mCount.setText(String.valueOf(location.getCount()) + " " + LOCATIONS);
+
     }
 
     @Override
     public void onBindChildViewHolder(LocationChildViewHolder locationChildViewHolder, int i, Object parentObject) {
         Location location = (Location) parentObject;
         locationChildViewHolder.mPlaceName.setText(location.getName());
-        locationChildViewHolder.mTime.setText(String.valueOf(location.getTimesVisited()));
+        if (location.getTimesVisited() == 1) {
+            locationChildViewHolder.mTime.setText(String.valueOf(location.getTimesVisited()) + " " + MIN);
+        } else
+            locationChildViewHolder.mTime.setText(String.valueOf(location.getTimesVisited()) + " " + MINS);
         locationChildViewHolder.bindUuid(location.getID());
     }
 

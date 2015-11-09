@@ -39,38 +39,34 @@ import java.util.Locale;
 /**
  * Created by andela-jugba on 11/3/15.
  */
-public class TrackerService extends Service implements
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class TrackerService extends Service {
 
     public static final String RESULT = "result";
     public static final String NOTIFICATION = "com.andela.checkpoint.onestep.receiver";
     private static final String TAG = "TrackerService";
     public static final double STEP_SIZE = 50;
-    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 1000 * 20;
-    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
-            UPDATE_INTERVAL_IN_MILLISECONDS / 2;
     private Geocoder mGeocoder;
     private CustomCountDown mCountDownTimer;
     private LocationHelper mLocationHelper;
     private AddressFinder mAddressFinder;
+    private LocationService mLocationService;
 
-    protected GoogleApiClient mGoogleApiClient;
-    protected LocationRequest mLocationRequest;
     protected Location mCurrentLocation;
-    protected Boolean mRequestingLocationUpdates;
 
 
     public static Intent newIntent(Context context) {
         return new Intent(context, TrackerService.class);
     }
 
-    public TrackerService() {
-    }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         int setTime = TimePreference.getStoredTime(getApplicationContext());
+        mLocationService = new LocationService(getApplicationContext(), new LocationService.CallBack() {
+            @Override
+            public void onStepChanged(Location location) {
+                mCurrentLocation = location;
+            }
+        });
         startTracking(true);
         mCountDownTimer = new CustomCountDown(setTime * 60 * 1000, 1000);
         return START_STICKY;
@@ -87,7 +83,6 @@ public class TrackerService extends Service implements
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-
         return null;
     }
 
@@ -95,84 +90,17 @@ public class TrackerService extends Service implements
     private void startTracking(boolean start) {
 
         if (start) {
-            mRequestingLocationUpdates = true;
-
-            buildGoogleApiClient();
-            mGoogleApiClient.connect();
+            mLocationService.mRequestingLocationUpdates = true;
+            mLocationService.buildGoogleApiClient();
+            mLocationService.connect();
         }
         if (!start) {
-            mRequestingLocationUpdates = false;
+            mLocationService.mRequestingLocationUpdates = false;
+            mLocationService.stopLocationUpdates();
             Log.i(TAG, "service should be stopped");
-            stopLocationUpdates();
             return;
         }
 
-    }
-
-
-    protected void showToast(String text) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
-    }
-
-    protected synchronized void buildGoogleApiClient() {
-        Log.i(TAG, "Building GoogleApiClient");
-        mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-        createLocationRequest();
-    }
-
-    protected void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
-        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
-
-
-    protected void startLocationUpdates() {
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
-    }
-
-    protected void stopLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-    }
-
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        Log.i(TAG, "Connected to GoogleApiClient");
-
-        if (mCurrentLocation == null) {
-            mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        }
-
-        if (mRequestingLocationUpdates) {
-            startLocationUpdates();
-        }
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-
-        mCurrentLocation = location;
-        if (location != null) {
-            mAddressFinder.findLocationAddress(location);
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int cause) {
-        Log.i(TAG, "Connection suspended");
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
     }
 
     @Override
@@ -189,7 +117,7 @@ public class TrackerService extends Service implements
 
         public CustomCountDown(long startTime, long interval) {
             super(startTime, interval);
-            mStartTime = startTime / (1000*60);
+            mStartTime = startTime / (1000 * 60);
             temLocation = mCurrentLocation;
             this.start();
         }
@@ -228,7 +156,6 @@ public class TrackerService extends Service implements
     private void sendNotifications() {
         Resources resources = getResources();
 
-        Intent i = LocationFragment.newIntent(getApplicationContext());
         Intent intent = new Intent(getApplicationContext(), LocationListActivity.class);
         PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
         Notification notification = new NotificationCompat.Builder(getBaseContext())
