@@ -7,33 +7,19 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.NotificationCompat;
-import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.andela.checkpoint.onestep.R;
 import com.andela.checkpoint.onestep.controllers.LocationListActivity;
 import com.andela.checkpoint.onestep.database.TimePreference;
-import com.andela.checkpoint.onestep.fragments.LocationFragment;
 import com.andela.checkpoint.onestep.models.LocationHelper;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -46,13 +32,11 @@ public class TrackerService extends Service {
     private static final String TAG = "TrackerService";
     public static final double STEP_SIZE = 50;
     private Geocoder mGeocoder;
-    private CustomCountDown mCountDownTimer;
     private LocationHelper mLocationHelper;
     private AddressFinder mAddressFinder;
     private LocationService mLocationService;
-
+    private LocationTimer mLocationTimer;
     protected Location mCurrentLocation;
-
 
     public static Intent newIntent(Context context) {
         return new Intent(context, TrackerService.class);
@@ -67,9 +51,46 @@ public class TrackerService extends Service {
                 mCurrentLocation = location;
             }
         });
+
         startTracking(true);
-        mCountDownTimer = new CustomCountDown(setTime * 60 * 1000, 1000);
+
+        mLocationTimer = new LocationTimer(setTime * 60 * 1000, 1000, mCurrentLocation, new LocationTimer.Callback() {
+            @Override
+            public void onTick(long l) {
+                updatePosition((int) l);
+            }
+
+            @Override
+            public void onFinish() {
+                recordPosition();
+            }
+        });
         return START_STICKY;
+    }
+
+    private void recordPosition() {
+        String locationName = mAddressFinder.findLocationAddress(mLocationTimer.mTemporaryLocation);
+        com.andela.checkpoint.onestep.models.Location location = new
+                com.andela.checkpoint.onestep.models.Location(mLocationTimer.mTemporaryLocation, locationName, (int) mLocationTimer.mStartTime);
+        mLocationHelper.addLocation(location);
+        sendNotifications();
+        mLocationTimer.start();
+    }
+
+    private void updatePosition(int l) {
+        int a = l / 1000;
+        if (mLocationTimer.mTemporaryLocation == null) {
+            mLocationTimer.mTemporaryLocation = mCurrentLocation;
+        }
+        if (a % 10 == 0) {
+            mLocationTimer.mDistanceInMeters = mLocationTimer.mTemporaryLocation.distanceTo(mCurrentLocation);
+            if (mLocationTimer.mDistanceInMeters > STEP_SIZE) {
+                mLocationTimer.mTemporaryLocation = mCurrentLocation;
+                updateUICounter(true);
+                mLocationTimer.cancel();
+                mLocationTimer.start();
+            }
+        }
     }
 
     @Override
@@ -107,50 +128,7 @@ public class TrackerService extends Service {
     public void onDestroy() {
         super.onDestroy();
         startTracking(false);
-        mCountDownTimer.cancel();
-    }
-
-    private class CustomCountDown extends CountDownTimer {
-        private double mStartTime;
-        private Location temLocation;
-        private float distanceInMeters;
-
-        public CustomCountDown(long startTime, long interval) {
-            super(startTime, interval);
-            mStartTime = startTime / (1000 * 60);
-            temLocation = mCurrentLocation;
-            this.start();
-        }
-
-        @Override
-        public void onTick(long l) {
-            int a = (int) l / 1000;
-            if (temLocation == null) {
-                temLocation = mCurrentLocation;
-            }
-            if (a % 10 == 0) {
-
-                distanceInMeters = temLocation.distanceTo(mCurrentLocation);
-                if (distanceInMeters > STEP_SIZE) {
-                    temLocation = mCurrentLocation;
-                    updateUICounter(true);
-                    this.cancel();
-                    this.start();
-                }
-            }
-        }
-
-        @Override
-        public void onFinish() {
-            String locationName = mAddressFinder.findLocationAddress(temLocation);
-            com.andela.checkpoint.onestep.models.Location location = new
-                    com.andela.checkpoint.onestep.models.Location(temLocation, locationName, (int) mStartTime);
-            mLocationHelper.addLocation(location);
-
-            // send notifications
-            sendNotifications();
-            this.start();
-        }
+        mLocationTimer.cancel();
     }
 
     private void sendNotifications() {
