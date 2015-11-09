@@ -31,7 +31,7 @@
                 android:layout_gravity="right"
                 android:text="5 Locations"
                 android:textSize="20sp"
-                android:visibility="gone" />
+                />
         </FrameLayout>
 
         <LinearLayout

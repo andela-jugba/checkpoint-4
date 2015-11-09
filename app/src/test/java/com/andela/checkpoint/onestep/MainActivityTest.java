@@ -1,7 +1,11 @@
 package com.andela.checkpoint.onestep;
 
+import android.content.Context;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.andela.checkpoint.onestep.controllers.MainActivity;
+import com.andela.checkpoint.onestep.services.TrackerService;
 
 import org.junit.After;
 import org.junit.Before;
@@ -10,10 +14,12 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowActivity;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.robolectric.Shadows.shadowOf;
 
 /**
  * Created by andela-jugba on 10/30/15.
@@ -22,10 +28,16 @@ import static org.junit.Assert.assertTrue;
 @Config(constants = BuildConfig.class, sdk = 21)
 public class MainActivityTest {
     private MainActivity testMainActivity;
+    private Context context;
+    private TrackerService trackerService;
+    private ShadowActivity shadow;
+
 
     @Before
     public void setUp() throws Exception {
         testMainActivity = Robolectric.setupActivity(MainActivity.class);
+//        trackerService = Robolectric.buildService(TrackerService.class).get();
+//        shadow = shadowOf(testMainActivity);
 
     }
 
@@ -61,6 +73,10 @@ public class MainActivityTest {
     private void thenTheSetStepButtonShouldNotBeEnabled() {
         TextView testStartView = (TextView) testMainActivity.findViewById(R.id.textViewPlay);
         testStartView.performClick();
+//
+//        Intent intent = shadow.getNextStartedService();
+//        assertEquals(TrackerService.class.getCanonicalName(), intent.getComponent().getClassName());
+
         Button testSetButton = (Button) testMainActivity.findViewById(R.id.buttonSetStep);
         assertTrue(!testSetButton.isEnabled());
 
@@ -85,4 +101,5 @@ public class MainActivityTest {
         assertEquals("The text should be equal", testSecView.getText(), "secs");
 
     }
+
 }

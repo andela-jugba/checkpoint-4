@@ -1,5 +1,6 @@
 package com.andela.checkpoint.onestep;
 
+import com.andela.checkpoint.onestep.controllers.MainActivity;
 import com.andela.checkpoint.onestep.models.Location;
 import com.andela.checkpoint.onestep.models.LocationHelper;
 
@@ -11,13 +12,10 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.andela.checkpoint.onestep.R;
+import com.andela.checkpoint.onestep.ui_helpers.recyclerView.ViewPagerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,8 @@ import java.util.List;
 public class LocationListFragment extends Fragment {
     private final String LOGS_BY_DAY = "Logs By Day";
     private final String LOGS_BY_LOCATION = "Logs By Location";
+    private ViewPager mViewPager;
+    private TabLayout mTabLayout;
 
 
     public LocationListFragment() {
@@ -39,13 +42,11 @@ public class LocationListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_location_list, container, false);
+        mViewPager = (ViewPager) view.findViewById(R.id.viewpager);
+        setupViewPager(mViewPager);
 
-        ViewPager viewPager = (ViewPager) view.findViewById(R.id.viewpager);
-
-        setupViewPager(viewPager);
-
-        TabLayout tabLayout = (TabLayout) view.findViewById(R.id.slidingTab);
-        tabLayout.setupWithViewPager(viewPager);
+        mTabLayout = (TabLayout) view.findViewById(R.id.slidingTab);
+        mTabLayout.setupWithViewPager(mViewPager);
 
         return view;
     }
@@ -56,36 +57,5 @@ public class LocationListFragment extends Fragment {
         adapter.addFragment(new LocationByLocationFragment(), LOGS_BY_LOCATION);
         viewPager.setAdapter(adapter);
     }
-
-    class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
-
-        public ViewPagerAdapter(FragmentManager manager) {
-            super(manager);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return mFragmentList.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return mFragmentList.size();
-        }
-
-        public void addFragment(Fragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
-        }
-
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mFragmentTitleList.get(position);
-        }
-    }
-
 
 }

@@ -149,6 +149,8 @@ public class Ranger extends HorizontalScrollView implements View.OnClickListener
 
         //Set Selection. Default is today.
         setSelectedDay(currentDateTime.getDayOfMonth(), false, DELAY_SELECTION);
+        setSelectedDay(5, false, DELAY_SELECTION);
+
     }
 
 
