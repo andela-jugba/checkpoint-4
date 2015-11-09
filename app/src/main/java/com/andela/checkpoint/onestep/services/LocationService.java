@@ -1,12 +1,8 @@
 package com.andela.checkpoint.onestep.services;
 
-import android.app.Service;
 import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
