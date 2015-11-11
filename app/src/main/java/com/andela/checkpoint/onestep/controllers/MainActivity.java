@@ -29,9 +29,8 @@ public class MainActivity extends AppCompatActivity {
     private WheelIndicatorView mWheelIndicatorView;
     private CountDownTimer mCountDownTimer;
     private Button mButtonSetStep;
-    private Button mButtonPlay;
-    private Button mButtonLogs;
     private TextView mTextViewStart;
+    private TextView mTextViewSec;
     private Ranger mRanger;
 
     private View mHiddenView;
@@ -64,64 +63,49 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setUpBasicUI() {
-        setUpWheelIndicator();
-        setUpCounter();
-
-        mButtonLogs = (Button) findViewById(R.id.buttonLog);
-        mButtonLogs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+    public void onClickButton(View view) {
+        int id = view.getId();
+        switch (id) {
+            case R.id.buttonLog:
                 Intent intent = new Intent(MainActivity.this, LocationListActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
-            }
-        });
-
-
-        mButtonSetStep = (Button) findViewById(R.id.buttonSetStep);
-        mHiddenView = findViewById(R.id.hiddenView);
-
-        mButtonSetStep.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+                break;
+            case R.id.buttonSetStep:
                 int visibility = mHiddenView.getVisibility();
 
                 if (visibility == View.VISIBLE) {
                     mHiddenView.setVisibility(View.INVISIBLE);
                 } else mHiddenView.setVisibility(View.VISIBLE);
-
-            }
-        });
-
-
-        mButtonPlay = (Button) findViewById(R.id.buttonPlay);
-        mButtonPlay.setVisibility(View.INVISIBLE);
-        mTextViewStart = (TextView) findViewById(R.id.textViewPlay);
-        mTextViewStart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = TrackerService.newIntent(MainActivity.this);
+                break;
+            case R.id.textViewPlay:
+                Intent intent1 = TrackerService.newIntent(MainActivity.this);
                 if (mButtonSetStep.isEnabled()) {
                     mButtonSetStep.setEnabled(false);
                     mCountDownTimer.start();
                     mTextViewStart.setText(R.string.app_stop);
-                    intent.putExtra("start", true);
-                    startService(intent);
+                    intent1.putExtra("start", true);
+                    startService(intent1);
                     return;
                 }
 
-                stopService(intent);
+                stopService(intent1);
                 Log.i(TAG, "service should be stopped");
                 mCountDownTimer.cancel();
                 mTextViewStart.setText(R.string.app_start);
                 mButtonSetStep.setEnabled(true);
+                break;
+        }
+    }
 
 
-            }
-        });
+    private void setUpBasicUI() {
+        setUpWheelIndicator();
+        setUpCounter();
 
+        mHiddenView = findViewById(R.id.hiddenView);
+        mButtonSetStep = (Button) findViewById(R.id.buttonSetStep);
+        mTextViewStart = (TextView) findViewById(R.id.textViewPlay);
+        mTextViewSec = (TextView) findViewById(R.id.textViewSec);
         mRanger = (Ranger) findViewById(R.id.listener_ranger);
         int time = TimePreference.getStoredTime(getApplicationContext());
 
@@ -157,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         mWheelIndicatorView.addWheelIndicatorItem(timeProgressIndicator);
     }
 
-    public class CustomCountDown extends CountDownTimer {
+    private class CustomCountDown extends CountDownTimer {
         private double mStartTime;
 
         public CustomCountDown(long startTime, long interval) {
@@ -169,10 +153,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onTick(long l) {
             int currentTime = (int) l / 1000;
-            if (currentTime > 999) {
-                mCounter.setTextSize(60);
+            if (currentTime > 60) {
+                mCounter.setTextSize(45);
+                mTextViewSec.setText("mins");
+            } else {
+                mCounter.setTextSize(71);
+                mTextViewSec.setText("secs");
             }
-            mCounter.setText("" + currentTime);
+            mCounter.setText(formatText(currentTime));
             int percent = (int) ((mStartTime - currentTime) / mStartTime * 100);
             mWheelIndicatorView.setFilledPercent(percent + 1);
             mWheelIndicatorView.notifyDataSetChanged();
@@ -183,6 +171,16 @@ public class MainActivity extends AppCompatActivity {
             mCounter.setText("0");
             this.start();
         }
+    }
+
+    private String formatText(int time) {
+        int mins = time / 60;
+        int secs = time - (mins * 60);
+        if (mins == 0) {
+            return "" + secs;
+        }
+        return "" + mins + ":" + secs;
+
     }
 
     @Override

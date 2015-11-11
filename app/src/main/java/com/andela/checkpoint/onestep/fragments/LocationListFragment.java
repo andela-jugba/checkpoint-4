@@ -33,9 +33,6 @@ public class LocationListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-
-        }
     }
 
     @Override
@@ -52,7 +49,7 @@ public class LocationListFragment extends Fragment {
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager());
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
         adapter.addFragment(new LocationByDateFragment(), LOGS_BY_DAY);
         adapter.addFragment(new LocationByLocationFragment(), LOGS_BY_LOCATION);
         viewPager.setAdapter(adapter);

@@ -5,5 +5,6 @@
     <color name="colorAccent">#28A1D8</color>
     <color name="transparent">#000000</color>
     <color name="white">#ffffff</color>
-    <color name="whitefiftypercent">#80ffffff</color>
+    <color name="wheel">#62B9D5</color>
+    <color name="whiteFiftyPercent">#80ffffff</color>
 </resources>

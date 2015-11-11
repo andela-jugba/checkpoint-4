@@ -31,6 +31,10 @@ public class LocationTimer extends CountDownTimer {
         mCallback.onFinish();
     }
 
+    public float distanceTo(Location location){
+        return mTemporaryLocation.distanceTo(location);
+    }
+
     interface Callback {
         void onTick(long l);
 

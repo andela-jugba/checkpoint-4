@@ -30,7 +30,7 @@ public class TrackerService extends Service {
     public static final String RESULT = "result";
     public static final String NOTIFICATION = "com.andela.checkpoint.onestep.receiver";
     private static final String TAG = "TrackerService";
-    public static final double STEP_SIZE = 50;
+    public static final float STEP_SIZE = 50;
     private Geocoder mGeocoder;
     private LocationHelper mLocationHelper;
     private AddressFinder mAddressFinder;
@@ -48,6 +48,11 @@ public class TrackerService extends Service {
         mLocationService = new LocationService(getApplicationContext(), new LocationService.CallBack() {
             @Override
             public void onStepChanged(Location location) {
+                mCurrentLocation = location;
+            }
+
+            @Override
+            public void onConnected(Location location) {
                 mCurrentLocation = location;
             }
         });
@@ -83,7 +88,7 @@ public class TrackerService extends Service {
             mLocationTimer.mTemporaryLocation = mCurrentLocation;
         }
         if (a % 10 == 0) {
-            mLocationTimer.mDistanceInMeters = mLocationTimer.mTemporaryLocation.distanceTo(mCurrentLocation);
+            mLocationTimer.mDistanceInMeters = mLocationTimer.distanceTo(mCurrentLocation);
             if (mLocationTimer.mDistanceInMeters > STEP_SIZE) {
                 mLocationTimer.mTemporaryLocation = mCurrentLocation;
                 updateUICounter(true);

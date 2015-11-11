@@ -54,6 +54,7 @@ public class LocationService implements
     protected void startLocationUpdates() {
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 mGoogleApiClient, mLocationRequest, this);
+
     }
 
     protected void stopLocationUpdates() {
@@ -66,6 +67,7 @@ public class LocationService implements
 
         if (mCurrentLocation == null) {
             mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            mCallBack.onConnected(mCurrentLocation);
         }
 
         if (mRequestingLocationUpdates) {
@@ -97,5 +99,6 @@ public class LocationService implements
 
     public interface CallBack {
         void onStepChanged(Location location);
+        void onConnected(Location location);
     }
 }

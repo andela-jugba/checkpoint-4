@@ -31,6 +31,7 @@
             android:layout_marginRight="@dimen/fab_margin"
             android:layout_marginTop="@dimen/fab_margin_top"
             android:background="@drawable/button_circle"
+            android:onClick="onClickButton"
             android:text="@string/logs"
             android:textColor="#FFFFFF"
             android:textSize="16sp" />
@@ -44,6 +45,7 @@
             android:layout_marginLeft="@dimen/fab_margin"
             android:layout_marginTop="@dimen/fab_margin_top"
             android:background="@drawable/button_circle"
+            android:onClick="onClickButton"
             android:text="@string/set_step"
             android:textColor="#FFFFFF"
             android:textSize="16sp" />
@@ -90,11 +92,6 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_media_play" />
 
                 <com.andressantibanez.ranger.Ranger
                     android:id="@+id/listener_ranger"
@@ -148,21 +145,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:onClick="onClickButton"
             android:text="start"
             android:textAllCaps="true"
             android:textColor="@color/white"
             android:textSize="45sp"
             android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/buttonPlay"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="center"
-            android:layout_marginBottom="@dimen/fab_margin_top"
-            android:layout_marginTop="@dimen/fab_margin_top"
-            android:background="@drawable/triangular_button"
-            android:rotation="90" />
 
     </FrameLayout>
 </LinearLayout>
